@@ -2,6 +2,39 @@
 
     Implementiert Sortierung (gepinnte Elemente oben)
     Filterfunktion nach Labels -->
+<div>
+    <input type="text" [(ngModel)]="title" placeholder="Title">
+    
+    <div *ngIf="!isChecklist">
+        <input type="text" [(ngModel)]="note" placeholder="Note">
+    </div>
+    
+    <div *ngIf="isChecklist">
+        <div *ngFor="let item of checklistItems; let i = index">
+            <input type="text" [(ngModel)]="checklistItems[i].text" placeholder="Checklist Item">
+            <input type="checkbox" [(ngModel)]="checklistItems[i].checked">
+            <button (click)="removeChecklistItem(i)">Remove</button>
+        </div>
+        <button (click)="addChecklistItem()">Add Checklist Item</button>
+    </div>
+    
+    <label>
+        <input type="checkbox" [(ngModel)]="isPinned"> Anpinnen
+    </label>
 
+    <label>
+        <input type="checkbox" [(ngModel)]="isChecklist"> Checkliste
+    </label>
+    <select [(ngModel)]="selectedColor">
+        <option value="">Default</option>
+        <option value="#ffcccb">Red</option>
+        <option value="#90ee90">Green</option>
+        <option value="#add8e6">Blue</option>
+        <option value="#ffffe0">Yellow</option>
+    </select>
 
+    <input type="file" (change)="onFileSelected($event)" multiple>
+
+    <button (click)="submit()">OK</button>
+</div>
 <p>notes-list-component works!</p>
