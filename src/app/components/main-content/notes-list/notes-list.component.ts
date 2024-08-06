@@ -1,17 +1,19 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NoteService } from '../../../services/note.service';
+import { Note } from '../../../model/note';
+import { NoteComponent } from '../note/note.component';
 
 @Component({
   selector: 'app-notes-list-component',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NoteComponent],
   providers: [DatePipe, NoteService], // Stelle DatePipe und NoteService hier bereit
   templateUrl: './notes-list.component.html',
   styleUrl: './notes-list.component.scss'
 })
-export class NotesListComponent {
+export class NotesListComponent implements OnInit {
   title: string = '';
   note: string = '';
   isChecklist: boolean = false;
@@ -20,7 +22,15 @@ export class NotesListComponent {
   selectedColor: string = '';
   attachments: File[] = [];
 
+  notes: Note[] = [];
+
   constructor(private noteService: NoteService) { }
+
+  ngOnInit() {
+    this.noteService.getNotes().subscribe(notes => {
+      this.notes = notes;
+    });
+  }
 
   addChecklistItem() {
     this.checklistItems.push({ text: '', checked: false });

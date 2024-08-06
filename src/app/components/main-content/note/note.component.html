@@ -5,5 +5,37 @@
     Label-Verwaltung
     Anhänge-Verwaltung -->
 
-
-<p>note-component works!</p>
+<!-- note.component.html -->
+<div [style.background-color]="note.color">
+    <h3>{{ note.title }} {{ note.isPinned ? '📌' : '' }}</h3>
+    <p *ngIf="!note.isChecklist">{{ note.content }}</p>
+    <ng-container *ngIf="note.isChecklist">
+        <ul cdkDropList (cdkDropListDropped)="onDrop($event, false)">
+            <li *ngFor="let item of uncheckedItems; let i = index" cdkDrag>
+                <div class="drag-handle">⋮</div>
+                <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(i, false)">
+                <span>{{ item.text }}</span>
+            </li>
+        </ul>
+        <div *ngIf="checkedItems.length > 0" class="completed-items">
+            <button (click)="toggleCompletedItems()" class="toggle-button">
+                {{ isCompletedItemsVisible ? '▼' : '▶' }}
+            </button>
+            {{ checkedItems.length }} Abgeschlossene {{ checkedItems.length === 1 ? 'Element' : 'Elemente' }}
+        </div>
+        <ul *ngIf="isCompletedItemsVisible" cdkDropList (cdkDropListDropped)="onDrop($event, true)">
+            <li *ngFor="let item of checkedItems; let i = index" cdkDrag>
+                <div class="drag-handle">⋮</div>
+                <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(i, true)">
+                <span class="completed">{{ item.text }}</span>
+            </li>
+        </ul>
+    </ng-container>
+    <p>Erstellt am: {{ note.createdAt | date:'medium' }}</p>
+    <div *ngIf="note.attachments.length > 0">
+        <h4>Anhänge:</h4>
+        <ul>
+            <li *ngFor="let attachment of note.attachments">{{ attachment }}</li>
+        </ul>
+    </div>
+</div>

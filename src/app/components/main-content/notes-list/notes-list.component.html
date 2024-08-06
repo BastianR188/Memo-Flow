@@ -4,11 +4,11 @@
     Filterfunktion nach Labels -->
 <div>
     <input type="text" [(ngModel)]="title" placeholder="Title">
-    
+
     <div *ngIf="!isChecklist">
         <input type="text" [(ngModel)]="note" placeholder="Note">
     </div>
-    
+
     <div *ngIf="isChecklist">
         <div *ngFor="let item of checklistItems; let i = index">
             <input type="text" [(ngModel)]="checklistItems[i].text" placeholder="Checklist Item">
@@ -17,7 +17,7 @@
         </div>
         <button (click)="addChecklistItem()">Add Checklist Item</button>
     </div>
-    
+
     <label>
         <input type="checkbox" [(ngModel)]="isPinned"> Anpinnen
     </label>
@@ -37,4 +37,10 @@
 
     <button (click)="submit()">OK</button>
 </div>
-<p>notes-list-component works!</p>
+
+<div>
+    <h2>Gespeicherte Notizen</h2>
+    <div *ngFor="let note of notes">
+        <app-note [note]="note"></app-note>
+    </div>
+</div>

@@ -1,5 +1,6 @@
-import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
+import { ChecklistItem, Note } from '../model/note';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,14 @@ export class NoteService {
   // CRUD-Operationen für Notizen und Checklisten
   // Synchronisation mit Firebase
 
-  constructor(private datePipe: DatePipe) {}
+  private notes: Note[] = [];
+  private notesSubject = new BehaviorSubject<Note[]>([]);
+
+  constructor() { }
+
+  getNotes(): Observable<Note[]> {
+    return this.notesSubject.asObservable();
+  }
 
   newId(): string {
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -25,24 +33,30 @@ export class NoteService {
     return new Date();
   }
 
-  submit(title: string, note: string, isChecklist: boolean, checklistItems: { text: string, checked: boolean }[], color: string, isPinned: boolean, attachments: File[]) {
-    const id = this.newId();
-    const type = isChecklist ? 'Checkliste' : 'Notiz';
-    const currentDate = this.getCurrentDate();
-    const formattedDate = this.datePipe.transform(currentDate, 'yyyy-MM-dd HH:mm:ss');
+  addNote(note: Note): void {
+    note.id = this.newId();
+    note.createdAt = new Date();
+    this.notes.push(note);
+    this.notesSubject.next([...this.notes]);
+  }
 
-    console.log('Wurde bestätigt!');
-    console.log('Title: ' + title);
-    console.log('Type: ' + type);
-    if (isChecklist) {
-      console.log('Checklist Items: ' + JSON.stringify(checklistItems));
-    } else {
-      console.log('Note: ' + note);
-    }
-    console.log('CreatedAt: ' + formattedDate);
-    console.log('Id: ' + id);
-    console.log('Color: ' + color);
-    console.log('Pinned: ' + isPinned);
-    console.log('Attachments: ' + attachments.map(file => file.name).join(', '));
+  submit(title: string, content: string, isChecklist: boolean, checklistItems: { text: string, checked: boolean }[], color: string, isPinned: boolean, attachments: File[]) {
+    const formattedChecklistItems: ChecklistItem[] = checklistItems.map((item, index) => ({
+      order: index,
+      text: item.text,
+      checked: item.checked
+    }));
+
+    const note = new Note({
+      title,
+      content,
+      isChecklist,
+      checklistItems: formattedChecklistItems,
+      color,
+      isPinned,
+      attachments: attachments.map(file => file.name)
+    });
+    this.addNote(note);
+    console.log('Neue Notiz hinzugefügt:', note);
   }
 }
