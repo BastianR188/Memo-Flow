@@ -1,9 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ChecklistItem, Note } from '../../../model/note';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { ChecklistItem, ImageAttachment, Note } from '../../../model/note';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, CdkDropList, CdkDrag, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
+import { AttachmentService } from '../../../services/attachment.service';
 import { NoteService } from '../../../services/note.service';
+import { ChecklistService } from '../../../services/checklist.service';
 
 @Component({
   selector: 'app-note',
@@ -12,16 +14,21 @@ import { NoteService } from '../../../services/note.service';
   templateUrl: './note.component.html',
   styleUrl: './note.component.scss'
 })
-export class NoteComponent implements OnInit {
+export class NoteComponent {
   @Input() note!: Note;
   @Output() pinStatusChanged = new EventEmitter<void>();
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
   isCompletedItemsVisible: boolean = true;
   isEditing: boolean = false;
+  attachments: ImageAttachment[] = [];
 
-  constructor(private noteService: NoteService) { }
+  constructor(
+    private noteService: NoteService,
+    private attachmentService: AttachmentService,
+    private checklistService: ChecklistService
+  ) { }
 
-  ngOnInit() {
-  }
   get uncheckedItems(): ChecklistItem[] {
     return this.note.checklistItems.filter(item => !item.checked);
   }
@@ -31,18 +38,13 @@ export class NoteComponent implements OnInit {
   }
 
   onDrop(event: CdkDragDrop<ChecklistItem[]>, isCheckedList: boolean) {
-    const list = isCheckedList ? this.checkedItems : this.uncheckedItems;
-    moveItemInArray(list, event.previousIndex, event.currentIndex);
-    this.updateNoteChecklistItems();
+    this.checklistService.reorderChecklistItems(this.note, event.previousIndex, event.currentIndex, isCheckedList);
     this.saveNote();
   }
 
   onCheckboxChange(index: number, isCheckedList: boolean) {
-    const sourceList = isCheckedList ? this.checkedItems : this.uncheckedItems;
-    const targetList = isCheckedList ? this.uncheckedItems : this.checkedItems;
-    const [movedItem] = sourceList.splice(index, 1);
-    targetList.push(movedItem);
-    this.updateNoteChecklistItems();
+    const item = isCheckedList ? this.checkedItems[index] : this.uncheckedItems[index];
+    this.checklistService.toggleChecklistItem(this.note, this.note.checklistItems.indexOf(item), !item.checked);
     this.saveNote();
   }
 
@@ -59,19 +61,15 @@ export class NoteComponent implements OnInit {
   editNote() {
     this.isEditing = true;
   }
+
   addChecklistItem() {
-    const newItem: ChecklistItem = {
-      text: '',
-      checked: false,
-      order: this.note.checklistItems.length // Setzt die Reihenfolge auf die aktuelle Länge der Liste
-    };
-    this.note.checklistItems.push(newItem);
-    this.updateNoteChecklistItems(); // Aktualisiere die Checklisten-Elemente nach dem Hinzufügen
+    this.checklistService.addChecklistItem(this.note);
+    this.saveNote();
   }
 
   removeChecklistItem(index: number) {
-    this.note.checklistItems.splice(index, 1);
-    this.updateNoteChecklistItems(); // Aktualisiere die Checklisten-Elemente nach dem Entfernen
+    this.checklistService.removeChecklistItem(this.note, index);
+    this.saveNote();
   }
 
   private updateNoteChecklistItems() {
@@ -86,16 +84,18 @@ export class NoteComponent implements OnInit {
     this.saveNote();
   }
 
-  onFileSelected(event: Event) {
+  async onFileSelected(event: Event) {
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
     if (fileList) {
-      Array.from(fileList).forEach(file => {
-        if (file.type.startsWith('image/')) {
-          this.note.attachments.push(file.name);
-        }
-      });
+      const newAttachments = await this.attachmentService.handleFileSelection(fileList);
+      this.note.attachments.push(...newAttachments);
       this.saveNote();
+
+      // Zurücksetzen des Datei-Eingabefelds
+      if (this.fileInput) {
+        this.fileInput.nativeElement.value = '';
+      }
     }
   }
 

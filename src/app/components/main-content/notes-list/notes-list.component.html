@@ -33,9 +33,9 @@
         <option value="#ffffe0">Yellow</option>
     </select>
 
-    <input type="file" (change)="onFileSelected($event)" #fileInput  multiple>
+    <input type="file" (change)="onFileSelected($event)" #fileInput multiple accept="image/*">
 
-    <button (click)="submit(fileInput)">OK</button>
+    <button (click)="submit()">OK</button>
 </div>
 
 <div>

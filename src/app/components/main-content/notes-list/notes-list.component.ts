@@ -1,9 +1,11 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NoteService } from '../../../services/note.service';
-import { Note } from '../../../model/note';
 import { NoteComponent } from '../note/note.component';
+import { AttachmentService } from '../../../services/attachment.service';
+import { ImageAttachment, Note } from '../../../model/note';
+import { ChecklistService } from '../../../services/checklist.service';
 
 @Component({
   selector: 'app-notes-list-component',
@@ -14,18 +16,34 @@ import { NoteComponent } from '../note/note.component';
   styleUrl: './notes-list.component.scss'
 })
 export class NotesListComponent implements OnInit {
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
   title: string = '';
   note: string = '';
-
   isChecklist: boolean = false;
   isPinned: boolean = false;
   checklistItems: { text: string, checked: boolean }[] = [];
   selectedColor: string = '';
-  attachments: File[] = [];
+  attachments: ImageAttachment[] = [];
   pinnedNotes: Note[] = [];
   unpinnedNotes: Note[] = [];
 
-  constructor(private noteService: NoteService) { }
+  newNote: Note = {
+    title: '',
+    content: '',
+    isChecklist: false,
+    checklistItems: [],
+    color: '',
+    isPinned: false,
+    createdAt: new Date(),
+    attachments: []
+  };
+
+  constructor(
+    private noteService: NoteService,
+    private attachmentService: AttachmentService,
+    private checklistService: ChecklistService
+  ) { }
 
   ngOnInit() {
     this.noteService.getNotes().subscribe(notes => {
@@ -40,7 +58,7 @@ export class NotesListComponent implements OnInit {
   }
 
   addChecklistItem() {
-    this.checklistItems.push({ text: '', checked: false });
+    this.checklistService.addChecklistItem(this.newNote);
   }
 
   sortNotes(notes: Note[]) {
@@ -49,41 +67,54 @@ export class NotesListComponent implements OnInit {
   }
 
   removeChecklistItem(index: number) {
-    this.checklistItems.splice(index, 1);
+    this.checklistService.removeChecklistItem(this.newNote, index);
   }
 
-  onFileSelected(event: Event) {
+  async onFileSelected(event: Event) {
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
     if (fileList) {
-      this.attachments = Array.from(fileList);
+      this.attachments = await this.attachmentService.handleFileSelection(fileList);
     }
   }
 
-  submit(fileInput: HTMLInputElement) {
-    this.noteService.submit(
-      this.title,
-      this.isChecklist ? '' : this.note,
-      this.isChecklist,
-      this.checklistItems,
-      this.selectedColor,
-      this.isPinned,
-      this.attachments
-    );
+  submit() {
+    this.newNote.title = this.title;
+    this.newNote.content = this.isChecklist ? '' : this.note;
+    this.newNote.isChecklist = this.isChecklist;
+    this.newNote.color = this.selectedColor;
+    this.newNote.isPinned = this.isPinned;
+    this.newNote.attachments = this.attachments;
+
+    this.noteService.addNote(this.newNote);
 
     // Aktualisiere die Notizen nach dem Hinzufügen
     this.loadNotes();
 
     // Reset form
+    this.resetForm();
+  }
+
+  resetForm() {
     this.title = '';
     this.note = '';
     this.isChecklist = false;
     this.isPinned = false;
-    this.checklistItems = [];
     this.selectedColor = '';
     this.attachments = [];
-
-    fileInput.value = '';
+    this.newNote = {
+      title: '',
+      content: '',
+      isChecklist: false,
+      checklistItems: [],
+      color: '',
+      isPinned: false,
+      createdAt: new Date(),
+      attachments: []
+    };
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
   }
 
   onPinStatusChanged() {

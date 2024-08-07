@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { ChecklistItem, Note } from '../model/note';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { ChecklistItem, ImageAttachment, Note } from '../model/note';
 
 @Injectable({
   providedIn: 'root',
@@ -48,23 +48,26 @@ export class NoteService {
     }
   }
 
-  submit(title: string, content: string, isChecklist: boolean, checklistItems: { text: string, checked: boolean }[], color: string, isPinned: boolean, attachments: File[]) {
+  submit(title: string, content: string, isChecklist: boolean, checklistItems: { text: string, checked: boolean }[], color: string, isPinned: boolean, attachments: ImageAttachment[]) {
     const formattedChecklistItems: ChecklistItem[] = checklistItems.map((item, index) => ({
       order: index,
       text: item.text,
       checked: item.checked
     }));
 
-    const note = new Note({
+    const note: Note = {
       title,
       content,
       isChecklist,
       checklistItems: formattedChecklistItems,
       color,
       isPinned,
-      attachments: attachments.map(file => file.name)
-    });
+      attachments: attachments,
+      createdAt: new Date()
+    };
+
     this.addNote(note);
     console.log('Neue Notiz hinzugefügt:', note);
   }
+
 }

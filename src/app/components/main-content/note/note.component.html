@@ -49,8 +49,10 @@
                 </li>
             </ul>
         </ng-container>
+
         <button (click)="editNote()">Bearbeiten</button>
     </div>
+
     <div>
         <select [(ngModel)]="note.color" (change)="changeColor(note.color)">
             <option value="">Default</option>
@@ -60,15 +62,18 @@
             <option value="#ffffe0">Yellow</option>
         </select>
     </div>
-    <button (click)="saveNote()">Speichern</button>
+
+    <input type="file" (change)="onFileSelected($event)" accept="image/*" multiple #fileInput>
+
     <p>Erstellt am: {{ note.createdAt | date:'medium' }}</p>
+
     <div *ngIf="note.attachments.length > 0">
         <h4>Anhänge:</h4>
-        <ul>
-            <li *ngFor="let attachment of note.attachments; let i = index">
-                {{ attachment }}
-                <button (click)="removeAttachment(i)">Entfernen</button>
-            </li>
-        </ul>
+        <div *ngFor="let attachment of note.attachments; let i = index">
+            <img [src]="attachment.url" alt="Attachment" style="max-width: 200px; max-height: 200px;">
+            <p>{{ attachment.name }} ({{ attachment.size | number }} bytes)</p>
+            <button (click)="removeAttachment(i)">Entfernen</button>
+        </div>
     </div>
+
 </div>
