@@ -33,14 +33,19 @@
         <option value="#ffffe0">Yellow</option>
     </select>
 
-    <input type="file" (change)="onFileSelected($event)" multiple>
+    <input type="file" (change)="onFileSelected($event)" #fileInput  multiple>
 
-    <button (click)="submit()">OK</button>
+    <button (click)="submit(fileInput)">OK</button>
 </div>
 
 <div>
-    <h2>Gespeicherte Notizen</h2>
-    <div *ngFor="let note of notes">
-        <app-note [note]="note"></app-note>
+    <h2>Angepinnte Notizen</h2>
+    <div *ngFor="let note of pinnedNotes">
+        <app-note [note]="note" (pinStatusChanged)="onPinStatusChanged()"></app-note>
+    </div>
+
+    <h2>Nicht angepinnte Notizen</h2>
+    <div *ngFor="let note of unpinnedNotes">
+        <app-note [note]="note" (pinStatusChanged)="onPinStatusChanged()"></app-note>
     </div>
 </div>

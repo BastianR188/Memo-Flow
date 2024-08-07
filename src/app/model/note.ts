@@ -2,7 +2,7 @@ export interface ChecklistItem {
     order: number;
     text: string;
     checked: boolean;
-  }
+}
 
 export class Note {
     id: string;

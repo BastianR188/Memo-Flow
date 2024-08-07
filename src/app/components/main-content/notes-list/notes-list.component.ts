@@ -16,24 +16,36 @@ import { NoteComponent } from '../note/note.component';
 export class NotesListComponent implements OnInit {
   title: string = '';
   note: string = '';
+
   isChecklist: boolean = false;
   isPinned: boolean = false;
   checklistItems: { text: string, checked: boolean }[] = [];
   selectedColor: string = '';
   attachments: File[] = [];
-
-  notes: Note[] = [];
+  pinnedNotes: Note[] = [];
+  unpinnedNotes: Note[] = [];
 
   constructor(private noteService: NoteService) { }
 
   ngOnInit() {
     this.noteService.getNotes().subscribe(notes => {
-      this.notes = notes;
+      this.sortNotes(notes);
+    });
+  }
+
+  loadNotes() {
+    this.noteService.getNotes().subscribe(notes => {
+      this.sortNotes(notes);
     });
   }
 
   addChecklistItem() {
     this.checklistItems.push({ text: '', checked: false });
+  }
+
+  sortNotes(notes: Note[]) {
+    this.pinnedNotes = notes.filter(note => note.isPinned);
+    this.unpinnedNotes = notes.filter(note => !note.isPinned);
   }
 
   removeChecklistItem(index: number) {
@@ -48,7 +60,7 @@ export class NotesListComponent implements OnInit {
     }
   }
 
-  submit() {
+  submit(fileInput: HTMLInputElement) {
     this.noteService.submit(
       this.title,
       this.isChecklist ? '' : this.note,
@@ -59,6 +71,9 @@ export class NotesListComponent implements OnInit {
       this.attachments
     );
 
+    // Aktualisiere die Notizen nach dem Hinzufügen
+    this.loadNotes();
+
     // Reset form
     this.title = '';
     this.note = '';
@@ -67,5 +82,11 @@ export class NotesListComponent implements OnInit {
     this.checklistItems = [];
     this.selectedColor = '';
     this.attachments = [];
+
+    fileInput.value = '';
+  }
+
+  onPinStatusChanged() {
+    this.loadNotes();
   }
 }

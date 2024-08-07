@@ -40,6 +40,14 @@ export class NoteService {
     this.notesSubject.next([...this.notes]);
   }
 
+  updateNote(updatedNote: Note): void {
+    const index = this.notes.findIndex(note => note.id === updatedNote.id);
+    if (index !== -1) {
+      this.notes[index] = updatedNote;
+      this.notesSubject.next([...this.notes]);
+    }
+  }
+
   submit(title: string, content: string, isChecklist: boolean, checklistItems: { text: string, checked: boolean }[], color: string, isPinned: boolean, attachments: File[]) {
     const formattedChecklistItems: ChecklistItem[] = checklistItems.map((item, index) => ({
       order: index,
