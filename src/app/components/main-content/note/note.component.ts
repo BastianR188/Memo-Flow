@@ -72,13 +72,6 @@ export class NoteComponent {
     this.saveNote();
   }
 
-  private updateNoteChecklistItems() {
-    this.note.checklistItems = [...this.uncheckedItems, ...this.checkedItems];
-    this.note.checklistItems.forEach((item, index) => {
-      item.order = index;
-    });
-  }
-
   changeColor(color: string) {
     this.note.color = color;
     this.saveNote();
@@ -104,10 +97,11 @@ export class NoteComponent {
     this.saveNote();
   }
 
-  saveNote() {
-    this.updateNoteChecklistItems(); // Aktualisiere die Checklisten-Elemente vor dem Speichern
-    this.noteService.updateNote(this.note);
+  async saveNote() {
+    await this.noteService.updateNote(this.note);
     this.isEditing = false;
     this.pinStatusChanged.emit();
   }
+
+
 }

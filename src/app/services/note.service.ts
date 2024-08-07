@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ChecklistItem, ImageAttachment, Note } from '../model/note';
+import { OfflineStorageService } from './offline-storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,8 +13,21 @@ export class NoteService {
 
   private notes: Note[] = [];
   private notesSubject = new BehaviorSubject<Note[]>([]);
+  private userId: string | null = null;
 
-  constructor() { }
+  constructor(private offlineStorage: OfflineStorageService) { }
+
+  async setUserId(userId: string) {
+    this.userId = userId;
+    await this.loadNotes();
+  }
+
+  private async loadNotes() {
+    if (this.userId) {
+      this.notes = await this.offlineStorage.getUserNotes(this.userId);
+      this.notesSubject.next(this.notes);
+    }
+  }
 
   getNotes(): Observable<Note[]> {
     return this.notesSubject.asObservable();
@@ -33,41 +47,34 @@ export class NoteService {
     return new Date();
   }
 
-  addNote(note: Note): void {
+  async addNote(note: Note): Promise<void> {
+    if (!this.userId) throw new Error('User not set');
     note.id = this.newId();
     note.createdAt = new Date();
     this.notes.push(note);
+    await this.saveNotes();
     this.notesSubject.next([...this.notes]);
   }
 
-  updateNote(updatedNote: Note): void {
+  async updateNote(updatedNote: Note): Promise<void> {
     const index = this.notes.findIndex(note => note.id === updatedNote.id);
     if (index !== -1) {
       this.notes[index] = updatedNote;
+      await this.saveNotes();
       this.notesSubject.next([...this.notes]);
     }
   }
 
-  submit(title: string, content: string, isChecklist: boolean, checklistItems: { text: string, checked: boolean }[], color: string, isPinned: boolean, attachments: ImageAttachment[]) {
-    const formattedChecklistItems: ChecklistItem[] = checklistItems.map((item, index) => ({
-      order: index,
-      text: item.text,
-      checked: item.checked
-    }));
+  async deleteNote(id: string): Promise<void> {
+    this.notes = this.notes.filter(note => note.id !== id);
+    await this.saveNotes();
+    this.notesSubject.next([...this.notes]);
+  }
 
-    const note: Note = {
-      title,
-      content,
-      isChecklist,
-      checklistItems: formattedChecklistItems,
-      color,
-      isPinned,
-      attachments: attachments,
-      createdAt: new Date()
-    };
-
-    this.addNote(note);
-    console.log('Neue Notiz hinzugefügt:', note);
+  private async saveNotes(): Promise<void> {
+    if (this.userId) {
+      await this.offlineStorage.saveUserNotes(this.userId, this.notes);
+    }
   }
 
 }

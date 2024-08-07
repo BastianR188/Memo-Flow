@@ -6,6 +6,7 @@ import { NoteComponent } from '../note/note.component';
 import { AttachmentService } from '../../../services/attachment.service';
 import { ImageAttachment, Note } from '../../../model/note';
 import { ChecklistService } from '../../../services/checklist.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-notes-list-component',
@@ -18,6 +19,7 @@ import { ChecklistService } from '../../../services/checklist.service';
 export class NotesListComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
+  userId: string = '';
   title: string = '';
   note: string = '';
   isChecklist: boolean = false;
@@ -29,6 +31,7 @@ export class NotesListComponent implements OnInit {
   unpinnedNotes: Note[] = [];
 
   newNote: Note = {
+    id: '',
     title: '',
     content: '',
     isChecklist: false,
@@ -40,14 +43,17 @@ export class NotesListComponent implements OnInit {
   };
 
   constructor(
+    private route: ActivatedRoute,
     private noteService: NoteService,
     private attachmentService: AttachmentService,
     private checklistService: ChecklistService
   ) { }
 
   ngOnInit() {
-    this.noteService.getNotes().subscribe(notes => {
-      this.sortNotes(notes);
+    this.route.params.subscribe(async params => {
+      const userId = params['id'];
+      await this.noteService.setUserId(userId);
+      this.loadNotes();
     });
   }
 
@@ -78,7 +84,7 @@ export class NotesListComponent implements OnInit {
     }
   }
 
-  submit() {
+  async createNote() {
     this.newNote.title = this.title;
     this.newNote.content = this.isChecklist ? '' : this.note;
     this.newNote.isChecklist = this.isChecklist;
@@ -86,7 +92,7 @@ export class NotesListComponent implements OnInit {
     this.newNote.isPinned = this.isPinned;
     this.newNote.attachments = this.attachments;
 
-    this.noteService.addNote(this.newNote);
+    await this.noteService.addNote(this.newNote);
 
     // Aktualisiere die Notizen nach dem Hinzufügen
     this.loadNotes();
@@ -103,6 +109,7 @@ export class NotesListComponent implements OnInit {
     this.selectedColor = '';
     this.attachments = [];
     this.newNote = {
+      id: '',
       title: '',
       content: '',
       isChecklist: false,
