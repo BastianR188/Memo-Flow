@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ChecklistItem, ImageAttachment, Note } from '../../../model/note';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, CdkDropList, CdkDrag, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -6,15 +6,16 @@ import { FormsModule } from '@angular/forms';
 import { AttachmentService } from '../../../services/attachment.service';
 import { NoteService } from '../../../services/note.service';
 import { ChecklistService } from '../../../services/checklist.service';
+import { ColorService } from '../../../services/color.service';
 
 @Component({
   selector: 'app-note',
   standalone: true,
   imports: [CommonModule, CdkDropList, CdkDrag, FormsModule],
   templateUrl: './note.component.html',
-  styleUrl: './note.component.scss'
+  styleUrls: ['./note.component.scss']
 })
-export class NoteComponent {
+export class NoteComponent implements OnInit {
   @Input() note!: Note;
   @Output() pinStatusChanged = new EventEmitter<void>();
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -22,12 +23,18 @@ export class NoteComponent {
   isCompletedItemsVisible: boolean = true;
   isEditing: boolean = false;
   attachments: ImageAttachment[] = [];
+  colors: { name: string, value: string }[] = []; // Array für die Farben
 
   constructor(
     private noteService: NoteService,
     private attachmentService: AttachmentService,
-    private checklistService: ChecklistService
+    private checklistService: ChecklistService,
+    private colorService: ColorService // Injektion des ColorService
   ) { }
+
+  ngOnInit() {
+    this.colors = this.colorService.getColors(); // Lade die Farben
+  }
 
   get uncheckedItems(): ChecklistItem[] {
     return this.note.checklistItems.filter(item => !item.checked);
@@ -38,19 +45,28 @@ export class NoteComponent {
   }
 
   onDrop(event: CdkDragDrop<ChecklistItem[]>, isCheckedList: boolean) {
-    this.checklistService.reorderChecklistItems(this.note, event.previousIndex, event.currentIndex, isCheckedList);
-    this.saveNote();
+    const itemList = isCheckedList ? this.checkedItems : this.uncheckedItems;
+    moveItemInArray(itemList, event.previousIndex, event.currentIndex);
+    itemList.forEach((item, index) => {
+      item.order = index;
+    });
+    this.updateChecklistOrder();
   }
 
-  onCheckboxChange(index: number, isCheckedList: boolean) {
-    const item = isCheckedList ? this.checkedItems[index] : this.uncheckedItems[index];
-    this.checklistService.toggleChecklistItem(this.note, this.note.checklistItems.indexOf(item), !item.checked);
-    this.saveNote();
+  updateChecklistOrder() {
+    // Sortiere die gesamte Checkliste basierend auf der `order`-Eigenschaft
+    this.note.checklistItems.sort((a, b) => a.order - b.order);
+  }
+
+  onCheckboxChange(itemId: string) {
+    const item = this.note.checklistItems.find(i => i.id === itemId);
+    if (item) {
+      this.updateChecklistOrder();
+    }
   }
 
   togglePinNote() {
     this.note.isPinned = !this.note.isPinned;
-    this.saveNote();
     this.pinStatusChanged.emit();
   }
 
@@ -64,44 +80,35 @@ export class NoteComponent {
 
   addChecklistItem() {
     this.checklistService.addChecklistItem(this.note);
-    this.saveNote();
   }
 
-  removeChecklistItem(index: number) {
-    this.checklistService.removeChecklistItem(this.note, index);
-    this.saveNote();
-  }
-
-  changeColor(color: string) {
-    this.note.color = color;
-    this.saveNote();
+  removeChecklistItem(itemId: string) {
+    this.checklistService.removeChecklistItem(this.note, itemId);
   }
 
   async onFileSelected(event: Event) {
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
     if (fileList) {
-      const newAttachments = await this.attachmentService.handleFileSelection(fileList);
-      this.note.attachments.push(...newAttachments);
-      this.saveNote();
-
-      // Zurücksetzen des Datei-Eingabefelds
+      await this.attachmentService.addAttachmentsToNote(this.note, fileList);
       if (this.fileInput) {
         this.fileInput.nativeElement.value = '';
       }
     }
   }
 
-  removeAttachment(index: number) {
-    this.note.attachments.splice(index, 1);
-    this.saveNote();
+  removeAttachment(attachmentId: string) {
+    this.attachmentService.removeAttachmentFromNote(this.note, attachmentId);
   }
 
   async saveNote() {
-    await this.noteService.updateNote(this.note);
     this.isEditing = false;
+    await this.noteService.updateNote(this.note);
     this.pinStatusChanged.emit();
   }
 
-
+  deleteNote() {
+    this.note.editAt = new Date();
+    this.noteService.moveToTrash(this.note);
+  }
 }

@@ -24,7 +24,7 @@ export class OfflineStorageService {
 
   private async initDB() {
     if (!this.db) {
-      this.db = await openDB<MyDB>('NotesApp', 2, {  // Erhöhe die Versionsnummer auf 2
+      this.db = await openDB<MyDB>('NotesApp', 2, {
         upgrade(db, oldVersion, newVersion, transaction) {
           if (!db.objectStoreNames.contains('userNotes')) {
             db.createObjectStore('userNotes', { keyPath: 'userId' });

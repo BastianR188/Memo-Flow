@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AttachmentComponent } from './attachment.component';
+import { TrashNoteComponent } from './trash-note.component';
 
-describe('AttachmentComponentComponent', () => {
-  let component: AttachmentComponent;
-  let fixture: ComponentFixture<AttachmentComponent>;
+describe('TrashNoteComponent', () => {
+  let component: TrashNoteComponent;
+  let fixture: ComponentFixture<TrashNoteComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AttachmentComponent]
+      imports: [TrashNoteComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AttachmentComponent);
+    fixture = TestBed.createComponent(TrashNoteComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

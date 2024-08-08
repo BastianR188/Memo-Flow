@@ -1,15 +1,19 @@
 export interface ChecklistItem {
+    id: string;
     order: number;
     text: string;
     checked: boolean;
 }
+
 export interface ImageAttachment {
+    id: string;
     name: string;
     url: string;
     size: number;
 }
+
 export interface Note {
-    id?: string;
+    id: string;
     title: string;
     content: string;
     isChecklist: boolean;
@@ -17,5 +21,7 @@ export interface Note {
     color: string;
     isPinned: boolean;
     createdAt: Date;
+    editAt: Date;
+    delete: boolean;
     attachments: ImageAttachment[];  // Ändere dies von string[] zu ImageAttachment[]
 }

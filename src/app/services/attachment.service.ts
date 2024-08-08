@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ImageAttachment } from '../model/note';
+import { ImageAttachment, Note } from '../model/note';
 
 @Injectable({
   providedIn: 'root'
@@ -7,22 +7,17 @@ import { ImageAttachment } from '../model/note';
 export class AttachmentService {
   
   constructor() { }
+  private generateUniqueId(): string {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+  }
 
-  async handleFileSelection(files: FileList): Promise<ImageAttachment[]> {
+  async handleFileSelection(fileList: FileList): Promise<ImageAttachment[]> {
     const attachments: ImageAttachment[] = [];
-    
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      if (file.type.startsWith('image/')) {
-        try {
-          const attachment = await this.createImageAttachment(file);
-          attachments.push(attachment);
-        } catch (error) {
-          console.error('Error processing file:', file.name, error);
-        }
-      }
+    for (let i = 0; i < fileList.length; i++) {
+      const file = fileList[i];
+      const attachment = await this.createImageAttachment(file);
+      attachments.push(attachment);
     }
-    
     return attachments;
   }
 
@@ -31,6 +26,7 @@ export class AttachmentService {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         resolve({
+          id: this.generateUniqueId(),  // Füge die ID hinzu
           name: file.name,
           url: e.target.result,
           size: file.size
@@ -39,5 +35,19 @@ export class AttachmentService {
       reader.onerror = (e) => reject(e);
       reader.readAsDataURL(file);
     });
+  }
+
+  async addAttachmentsToNote(note: Note, fileList: FileList): Promise<void> {
+    const newAttachments = await this.handleFileSelection(fileList);
+    newAttachments.forEach(attachment => {
+      note.attachments.push(attachment);
+    });
+  }
+
+  removeAttachmentFromNote(note: Note, attachmentId: string): void {
+    const index = note.attachments.findIndex(attachment => attachment.id === attachmentId);
+    if (index !== -1) {
+      note.attachments.splice(index, 1);
+    }
   }
 }

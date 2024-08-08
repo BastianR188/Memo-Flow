@@ -13,7 +13,7 @@
         <div *ngFor="let item of checklistItems; let i = index">
             <input type="text" [(ngModel)]="checklistItems[i].text" placeholder="Checklist Item">
             <input type="checkbox" [(ngModel)]="checklistItems[i].checked">
-            <button (click)="removeChecklistItem(i)">Remove</button>
+            <button (click)="removeChecklistItem(item.id)">Remove</button>
         </div>
         <button (click)="addChecklistItem()">Add Checklist Item</button>
     </div>
@@ -25,13 +25,10 @@
     <label>
         <input type="checkbox" [(ngModel)]="isChecklist"> Checkliste
     </label>
+
     <select [(ngModel)]="selectedColor">
-        <option value="">Default</option>
-        <option value="#ffcccb">Red</option>
-        <option value="#90ee90">Green</option>
-        <option value="#add8e6">Blue</option>
-        <option value="#ffffe0">Yellow</option>
-    </select>
+        <option *ngFor="let color of colors" [value]="color.value">{{ color.name }}</option>
+      </select>
 
     <input type="file" (change)="onFileSelected($event)" #fileInput multiple accept="image/*">
 
@@ -40,12 +37,12 @@
 
 <div>
     <h2>Angepinnte Notizen</h2>
-    <div *ngFor="let note of pinnedNotes">
-        <app-note [note]="note" (pinStatusChanged)="onPinStatusChanged()"></app-note>
+    <div *ngFor="let note of noteService.pinnedNotes">
+        <app-note [note]="note"></app-note>
     </div>
 
     <h2>Nicht angepinnte Notizen</h2>
-    <div *ngFor="let note of unpinnedNotes">
-        <app-note [note]="note" (pinStatusChanged)="onPinStatusChanged()"></app-note>
+    <div *ngFor="let note of noteService.unpinnedNotes">
+        <app-note [note]="note"></app-note>
     </div>
 </div>

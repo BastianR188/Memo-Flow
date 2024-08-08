@@ -1,0 +1,5 @@
+<div class="">
+    <app-side-menu></app-side-menu>
+    <app-notes-list *ngIf="!noteService.openTrash"></app-notes-list>
+    <app-trash *ngIf="noteService.openTrash"></app-trash>
+</div>

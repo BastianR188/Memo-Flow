@@ -8,30 +8,37 @@
 <!-- note.component.html -->
 <div [style.background-color]="note.color">
     <span>{{ note.isPinned ? '📌' : '' }}</span>
-    <button (click)="togglePinNote()">Pinnen</button>
+    <button (click)="togglePinNote();saveNote()">Pinnen</button>
+
     <div *ngIf="isEditing">
         <input type="text" [(ngModel)]="note.title" placeholder="Title">
+
         <div *ngIf="!note.isChecklist">
             <input type="text" [(ngModel)]="note.content" placeholder="Note">
         </div>
+
         <div *ngIf="note.isChecklist">
             <div *ngFor="let item of note.checklistItems; let i = index">
                 <input type="text" [(ngModel)]="note.checklistItems[i].text" placeholder="Checklist Item">
                 <input type="checkbox" [(ngModel)]="note.checklistItems[i].checked">
-                <button (click)="removeChecklistItem(i)">Remove</button>
+                <button (click)="removeChecklistItem(item.id)">Remove</button>
             </div>
             <button (click)="addChecklistItem()">Add Checklist Item</button>
         </div>
+
         <button (click)="saveNote()">Speichern</button>
     </div>
     <div *ngIf="!isEditing">
+
         <h3>{{ note.title }} </h3>
+
         <p *ngIf="!note.isChecklist">{{ note.content }}</p>
+
         <ng-container *ngIf="note.isChecklist">
-            <ul cdkDropList (cdkDropListDropped)="onDrop($event, false)">
+            <ul cdkDropList (cdkDropListDropped)="onDrop($event, false);saveNote()">
                 <li *ngFor="let item of uncheckedItems; let i = index" cdkDrag>
                     <div class="drag-handle">⋮</div>
-                    <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(i, false)">
+                    <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(item.id);saveNote()">
                     <span>{{ item.text }}</span>
                 </li>
             </ul>
@@ -41,10 +48,10 @@
                 </button>
                 {{ checkedItems.length }} Abgeschlossene {{ checkedItems.length === 1 ? 'Element' : 'Elemente' }}
             </div>
-            <ul *ngIf="isCompletedItemsVisible" cdkDropList (cdkDropListDropped)="onDrop($event, true)">
+            <ul *ngIf="isCompletedItemsVisible" cdkDropList (cdkDropListDropped)="onDrop($event, true);saveNote()">
                 <li *ngFor="let item of checkedItems; let i = index" cdkDrag>
                     <div class="drag-handle">⋮</div>
-                    <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(i, true)">
+                    <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(item.id);saveNote()">
                     <span class="completed">{{ item.text }}</span>
                 </li>
             </ul>
@@ -54,26 +61,23 @@
     </div>
 
     <div>
-        <select [(ngModel)]="note.color" (change)="changeColor(note.color)">
-            <option value="">Default</option>
-            <option value="#ffcccb">Red</option>
-            <option value="#90ee90">Green</option>
-            <option value="#add8e6">Blue</option>
-            <option value="#ffffe0">Yellow</option>
+        <select [(ngModel)]="note.color" (change)="saveNote()">
+            <option *ngFor="let color of colors" [value]="color.value">{{ color.name }}</option>
         </select>
     </div>
 
-    <input type="file" (change)="onFileSelected($event)" accept="image/*" multiple #fileInput>
-
-    <p>Erstellt am: {{ note.createdAt | date:'medium' }}</p>
+    <input type="file" (change)="onFileSelected($event);this.saveNote()" accept="image/*" multiple #fileInput>
 
     <div *ngIf="note.attachments.length > 0">
         <h4>Anhänge:</h4>
         <div *ngFor="let attachment of note.attachments; let i = index">
             <img [src]="attachment.url" alt="Attachment" style="max-width: 200px; max-height: 200px;">
             <p>{{ attachment.name }} ({{ attachment.size | number }} bytes)</p>
-            <button (click)="removeAttachment(i)">Entfernen</button>
+            <button (click)="removeAttachment(attachment.id);this.saveNote()">Entfernen</button>
         </div>
     </div>
+    <button (click)="deleteNote()">Löschen</button>
+    <p *ngIf="note.createdAt == note.editAt">Erstellt am: {{ note.createdAt | date:'medium' }}</p>
+    <p *ngIf="note.createdAt != note.editAt">Bearbeitet am: {{ note.editAt | date:'medium'}}</p>
 
 </div>
