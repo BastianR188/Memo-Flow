@@ -40,7 +40,7 @@ export class NotesListComponent implements OnInit {
 
   async createNote() {
     const newNote: Note = {
-      id: '',
+      id: this.noteService.newId(),
       title: this.title,
       content: this.isChecklist ? '' : this.note,
       isChecklist: this.isChecklist,
@@ -49,7 +49,7 @@ export class NotesListComponent implements OnInit {
       isPinned: this.isPinned,
       attachments: this.attachments,
       createdAt: new Date(),
-      editAt: new Date(),
+      editAt: null,
       delete: false
     };
 

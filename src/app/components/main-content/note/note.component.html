@@ -10,24 +10,9 @@
     <span>{{ note.isPinned ? '📌' : '' }}</span>
     <button (click)="togglePinNote();saveNote()">Pinnen</button>
 
-    <div *ngIf="isEditing">
-        <input type="text" [(ngModel)]="note.title" placeholder="Title">
-
-        <div *ngIf="!note.isChecklist">
-            <input type="text" [(ngModel)]="note.content" placeholder="Note">
-        </div>
-
-        <div *ngIf="note.isChecklist">
-            <div *ngFor="let item of note.checklistItems; let i = index">
-                <input type="text" [(ngModel)]="note.checklistItems[i].text" placeholder="Checklist Item">
-                <input type="checkbox" [(ngModel)]="note.checklistItems[i].checked">
-                <button (click)="removeChecklistItem(item.id)">Remove</button>
-            </div>
-            <button (click)="addChecklistItem()">Add Checklist Item</button>
-        </div>
-
-        <button (click)="saveNote()">Speichern</button>
-    </div>
+    <app-editing-note *ngIf="isEditing && editedNote" [note]="editedNote" (save)="saveNote()"
+        (cancel)="abortEditNote()">
+    </app-editing-note>
     <div *ngIf="!isEditing">
 
         <h3>{{ note.title }} </h3>
@@ -77,7 +62,10 @@
         </div>
     </div>
     <button (click)="deleteNote()">Löschen</button>
-    <p *ngIf="note.createdAt == note.editAt">Erstellt am: {{ note.createdAt | date:'medium' }}</p>
-    <p *ngIf="note.createdAt != note.editAt">Bearbeitet am: {{ note.editAt | date:'medium'}}</p>
-
+    <ng-container *ngIf="note.editAt == null; else edited">
+        <p>Erstellt am: {{ note.createdAt | date:'medium' }}</p>
+    </ng-container>
+    <ng-template #edited>
+        <p>Bearbeitet am: {{ note.editAt | date:'medium' }}</p>
+    </ng-template>
 </div>

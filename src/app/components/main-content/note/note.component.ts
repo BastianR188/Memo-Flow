@@ -7,11 +7,12 @@ import { AttachmentService } from '../../../services/attachment.service';
 import { NoteService } from '../../../services/note.service';
 import { ChecklistService } from '../../../services/checklist.service';
 import { ColorService } from '../../../services/color.service';
+import { EditingNoteComponent } from "../editing-note/editing-note.component";
 
 @Component({
   selector: 'app-note',
   standalone: true,
-  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule],
+  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule, EditingNoteComponent],
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.scss']
 })
@@ -19,7 +20,7 @@ export class NoteComponent implements OnInit {
   @Input() note!: Note;
   @Output() pinStatusChanged = new EventEmitter<void>();
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-
+  editedNote: Note | null = null;
   isCompletedItemsVisible: boolean = true;
   isEditing: boolean = false;
   attachments: ImageAttachment[] = [];
@@ -28,7 +29,6 @@ export class NoteComponent implements OnInit {
   constructor(
     private noteService: NoteService,
     private attachmentService: AttachmentService,
-    private checklistService: ChecklistService,
     private colorService: ColorService // Injektion des ColorService
   ) { }
 
@@ -75,16 +75,26 @@ export class NoteComponent implements OnInit {
   }
 
   editNote() {
+    this.editedNote = { ...this.note };
     this.isEditing = true;
+    console.log('Dieser Note wird editiert:', this.editedNote)
   }
 
-  addChecklistItem() {
-    this.checklistService.addChecklistItem(this.note);
+  abortEditNote() {
+    this.isEditing = false;
+    this.editedNote = null;
   }
 
-  removeChecklistItem(itemId: string) {
-    this.checklistService.removeChecklistItem(this.note, itemId);
+  async saveNote() {
+    if (this.editedNote) {
+      this.note = { ...this.editedNote };
+      this.isEditing = false;
+      await this.noteService.updateNote(this.note);
+      this.pinStatusChanged.emit();
+    }
   }
+
+
 
   async onFileSelected(event: Event) {
     const element = event.currentTarget as HTMLInputElement;
@@ -101,11 +111,7 @@ export class NoteComponent implements OnInit {
     this.attachmentService.removeAttachmentFromNote(this.note, attachmentId);
   }
 
-  async saveNote() {
-    this.isEditing = false;
-    await this.noteService.updateNote(this.note);
-    this.pinStatusChanged.emit();
-  }
+
 
   deleteNote() {
     this.note.editAt = new Date();

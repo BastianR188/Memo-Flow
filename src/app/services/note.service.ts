@@ -41,9 +41,6 @@ export class NoteService {
 
   async addNote(note: Note): Promise<void> {
     if (!this.userId) throw new Error('User not set');
-    note.id = this.newId();
-    note.createdAt = new Date();
-    note.editAt = new Date();
     this.notes.push(note);
     await this.saveNotes();
     this.notesSubject.next([...this.notes]);

@@ -21,7 +21,7 @@ export interface Note {
     color: string;
     isPinned: boolean;
     createdAt: Date;
-    editAt: Date;
+    editAt: Date | null;  // Erlaubt null oder einen leeren String
     delete: boolean;
-    attachments: ImageAttachment[];  // Ändere dies von string[] zu ImageAttachment[]
+    attachments: ImageAttachment[];
 }
