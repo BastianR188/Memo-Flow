@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { NoteService } from '../../../services/note.service';
 import { AttachmentService } from '../../../services/attachment.service';
 import { ChecklistService } from '../../../services/checklist.service';
@@ -17,13 +17,14 @@ import { ColorService } from '../../../services/color.service';
 })
 export class NotesListComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-
+  selectedColor: string = 'white'; // Standardfarbe, falls gewünscht
+  isDropdownOpen: boolean = false;
+  imageUrls: string[] = [];
   userId: string = '';
   title: string = '';
   note: string = '';
   isChecklist: boolean = false;
   isPinned: boolean = false;
-  selectedColor: string = '';
   attachments: ImageAttachment[] = [];
   checklistItems: ChecklistItem[] = [];
   colors: { name: string, value: string }[] = []; // Array für die Farben
@@ -56,7 +57,20 @@ export class NotesListComponent implements OnInit {
     await this.noteService.addNote(newNote);
     this.resetForm();
   }
-
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.color-selector')) {
+      this.isDropdownOpen = false;
+    }
+  }
+  selectColor(color: string) {
+    this.selectedColor = color;
+    this.isDropdownOpen = false;
+  }
   resetForm() {
     this.title = '';
     this.note = '';
@@ -65,6 +79,7 @@ export class NotesListComponent implements OnInit {
     this.selectedColor = '';
     this.attachments = [];
     this.checklistItems = [];
+    this.imageUrls = [];
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }
@@ -88,12 +103,27 @@ export class NotesListComponent implements OnInit {
   }
 
   async onFileSelected(event: Event) {
-    const element = event.currentTarget as HTMLInputElement;
-    let fileList: FileList | null = element.files;
+    const input = event.currentTarget as HTMLInputElement;
+    const fileList: FileList | null = input.files;
     if (fileList) {
-      this.attachments = await this.attachmentService.handleFileSelection(fileList);
+      // Verarbeite die Dateien mit deinem Service und füge sie zur bestehenden Liste hinzu
+      const newAttachments = await this.attachmentService.handleFileSelection(fileList);
+      this.attachments = this.attachments.concat(newAttachments);
+
+      // Lese die neuen Dateien als Daten-URLs ein und füge sie zur bestehenden Liste hinzu
+      Array.from(fileList).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const result = e.target?.result;
+          if (typeof result === 'string') {
+            this.imageUrls.push(result);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
     }
   }
+
 
   onPinStatusChanged() {
   }

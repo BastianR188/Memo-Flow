@@ -13,12 +13,10 @@
     <app-editing-note *ngIf="isEditing && editedNote" [note]="editedNote" (save)="saveNote()"
         (cancel)="abortEditNote()">
     </app-editing-note>
+
     <div *ngIf="!isEditing">
-
         <h3>{{ note.title }} </h3>
-
         <p *ngIf="!note.isChecklist">{{ note.content }}</p>
-
         <ng-container *ngIf="note.isChecklist">
             <ul cdkDropList (cdkDropListDropped)="onDrop($event, false);saveNote()">
                 <li *ngFor="let item of uncheckedItems; let i = index" cdkDrag>
@@ -41,14 +39,18 @@
                 </li>
             </ul>
         </ng-container>
-
         <button (click)="editNote()">Bearbeiten</button>
     </div>
 
     <div>
-        <select [(ngModel)]="note.color" (change)="saveNote()">
-            <option *ngFor="let color of colors" [value]="color.value">{{ color.name }}</option>
-        </select>
+        <div class="color-selector" (click)="toggleDropdown()">
+            <img class="icon" [style.backgroundColor]="selectedColor" src="assets/icons/color-white.svg" alt="">
+            <div class="dropdown-menu" *ngIf="isDropdownOpen">
+                <div *ngFor="let color of colors" class="dropdown-item icon" [style.backgroundColor]="color.value"
+                    (click)="selectColor(color.value);toggleDropdown();saveNote()">
+                </div>
+            </div>
+        </div>
     </div>
 
     <input type="file" (change)="onFileSelected($event);this.saveNote()" accept="image/*" multiple #fileInput>
@@ -58,7 +60,7 @@
         <div *ngFor="let attachment of note.attachments; let i = index">
             <img [src]="attachment.url" alt="Attachment" style="max-width: 200px; max-height: 200px;">
             <p>{{ attachment.name }} ({{ attachment.size | number }} bytes)</p>
-            <button (click)="removeAttachment(attachment.id);this.saveNote()">Entfernen</button>
+            <button (click)="removeAttachment(attachment.id); saveNote()">Entfernen</button>
         </div>
     </div>
     <button (click)="deleteNote()">Löschen</button>

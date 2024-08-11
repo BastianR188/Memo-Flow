@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ChecklistItem, ImageAttachment, Note } from '../../../model/note';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, CdkDropList, CdkDrag, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -20,6 +20,8 @@ export class NoteComponent implements OnInit {
   @Input() note!: Note;
   @Output() pinStatusChanged = new EventEmitter<void>();
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  selectedColor: string = 'white'; // Standardfarbe, falls gewünscht
+  isDropdownOpen: boolean = false;
   editedNote: Note | null = null;
   isCompletedItemsVisible: boolean = true;
   isEditing: boolean = false;
@@ -29,7 +31,7 @@ export class NoteComponent implements OnInit {
   constructor(
     private noteService: NoteService,
     private attachmentService: AttachmentService,
-    private colorService: ColorService // Injektion des ColorService
+    private colorService: ColorService // Injektion des ColorService,
   ) { }
 
   ngOnInit() {
@@ -52,7 +54,20 @@ export class NoteComponent implements OnInit {
     });
     this.updateChecklistOrder();
   }
-
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.color-selector')) {
+      this.isDropdownOpen = false;
+    }
+  }
+  selectColor(color: string) {
+    this.note.color = color;
+    this.isDropdownOpen = false;
+  }
   updateChecklistOrder() {
     // Sortiere die gesamte Checkliste basierend auf der `order`-Eigenschaft
     this.note.checklistItems.sort((a, b) => a.order - b.order);
@@ -88,11 +103,12 @@ export class NoteComponent implements OnInit {
   async saveNote() {
     if (this.editedNote) {
       this.note = { ...this.editedNote };
-      this.isEditing = false;
-      await this.noteService.updateNote(this.note);
-      this.pinStatusChanged.emit();
     }
+    this.isEditing = false;
+    await this.noteService.updateNote(this.note);
+    this.pinStatusChanged.emit();
   }
+
 
 
 

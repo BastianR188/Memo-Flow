@@ -2,39 +2,59 @@
 
     Implementiert Sortierung (gepinnte Elemente oben)
     Filterfunktion nach Labels -->
-<div>
-    <input type="text" [(ngModel)]="title" placeholder="Title">
-
-    <div *ngIf="!isChecklist">
-        <input type="text" [(ngModel)]="note" placeholder="Note">
-    </div>
-
-    <div *ngIf="isChecklist">
-        <div *ngFor="let item of checklistItems; let i = index">
-            <input type="text" [(ngModel)]="checklistItems[i].text" placeholder="Checklist Item">
-            <input type="checkbox" [(ngModel)]="checklistItems[i].checked">
-            <button (click)="removeChecklistItem(item.id)">Remove</button>
+<div class="main-input-container">
+    <div class="input-container">
+        <div>
+            <div>
+                <input type="text" [(ngModel)]="title" placeholder="Title">
+                <label>
+                    <input type="checkbox" [(ngModel)]="isPinned"> Anpinnen
+                </label>
+            </div>
+            <div class="input-content-container">
+                <div *ngIf="!isChecklist">
+                    <input type="text" [(ngModel)]="note" placeholder="Note">
+                </div>
+                <div *ngIf="isChecklist">
+                    <div *ngFor="let item of checklistItems; let i = index">
+                        <input type="text" [(ngModel)]="checklistItems[i].text" placeholder="Checklist Item">
+                        <input type="checkbox" [(ngModel)]="checklistItems[i].checked">
+                        <button (click)="removeChecklistItem(item.id)">Remove</button>
+                    </div>
+                    <button (click)="addChecklistItem()">Add Checklist Item</button>
+                </div>
+                <label>
+                    <input type="checkbox" [(ngModel)]="isChecklist"> Checkliste
+                </label>
+            </div>
         </div>
-        <button (click)="addChecklistItem()">Add Checklist Item</button>
+
+        <div class="input-footer-container">
+            <div class="color-selector" (click)="toggleDropdown()">
+                <img class="icon" [style.backgroundColor]="selectedColor" src="assets/icons/color-white.svg" alt="">
+                <div class="dropdown-menu" *ngIf="isDropdownOpen">
+                    <div *ngFor="let color of colors" class="dropdown-item icon" [style.backgroundColor]="color.value"
+                        (click)="selectColor(color.value);toggleDropdown()">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <img class="icon" src="assets/icons/img-white.svg" alt="" (click)="fileInput.click()">
+                <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*"
+                    style="display: none;">
+            </div>
+
+            <div class="image-preview">
+                <img *ngFor="let imageUrl of imageUrls" [src]="imageUrl" alt="Selected Image" class="preview-image">
+            </div>
+
+
+
+            <button class="icon" (click)="createNote()">OK</button>
+        </div>
     </div>
-
-    <label>
-        <input type="checkbox" [(ngModel)]="isPinned"> Anpinnen
-    </label>
-
-    <label>
-        <input type="checkbox" [(ngModel)]="isChecklist"> Checkliste
-    </label>
-
-    <select [(ngModel)]="selectedColor">
-        <option *ngFor="let color of colors" [value]="color.value">{{ color.name }}</option>
-      </select>
-
-    <input type="file" (change)="onFileSelected($event)" #fileInput multiple accept="image/*">
-
-    <button (click)="createNote()">OK</button>
 </div>
-
 <div>
     <h2>Angepinnte Notizen</h2>
     <div *ngFor="let note of noteService.pinnedNotes">

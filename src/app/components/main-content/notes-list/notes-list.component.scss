@@ -1,0 +1,38 @@
+.main-input-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+
+    .input-content-container {
+        display: flex;
+        .input-container{
+            width: min-content;
+        }
+    }
+
+    .image-preview {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+
+    .preview-image {
+        width: 100px;
+        /* Beispielgröße */
+        height: 100px;
+        /* Beispielgröße */
+        object-fit: cover;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    .input-footer-container{
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+
+
+}
