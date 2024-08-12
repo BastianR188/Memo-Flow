@@ -4,28 +4,33 @@
     Filterfunktion nach Labels -->
 <div class="main-input-container">
     <div class="input-container">
-        <div>
+        <div class="input-box">
             <div>
-                <input type="text" [(ngModel)]="title" placeholder="Title">
+                <input class="input-title" type="text" [(ngModel)]="title" placeholder="Title">
                 <label>
                     <input type="checkbox" [(ngModel)]="isPinned"> Anpinnen
                 </label>
             </div>
             <div class="input-content-container">
                 <div *ngIf="!isChecklist">
-                    <input type="text" [(ngModel)]="note" placeholder="Note">
+                    <input class="input-content" type="text" [(ngModel)]="note" placeholder="Note">
+                    <label>
+                        <input type="checkbox" [(ngModel)]="isChecklist" (click)="addChecklistItem()"> Checkliste
+                    </label>
+    
                 </div>
                 <div *ngIf="isChecklist">
                     <div *ngFor="let item of checklistItems; let i = index">
-                        <input type="text" [(ngModel)]="checklistItems[i].text" placeholder="Checklist Item">
+                        <input class="input-content" type="text" [(ngModel)]="checklistItems[i].text" placeholder="Checklist Item">
                         <input type="checkbox" [(ngModel)]="checklistItems[i].checked">
                         <button (click)="removeChecklistItem(item.id)">Remove</button>
                     </div>
                     <button (click)="addChecklistItem()">Add Checklist Item</button>
+                    <label>
+                        <input type="checkbox" [(ngModel)]="isChecklist"> Checkliste
+                    </label>
+
                 </div>
-                <label>
-                    <input type="checkbox" [(ngModel)]="isChecklist"> Checkliste
-                </label>
             </div>
         </div>
 
@@ -55,14 +60,19 @@
         </div>
     </div>
 </div>
-<div>
-    <h2>Angepinnte Notizen</h2>
-    <div *ngFor="let note of noteService.pinnedNotes">
-        <app-note [note]="note"></app-note>
+<div class="main-note-board">
+    <div *ngIf="noteService.pinnedNotes.length != 0">
+        <h2>Angepinnte Notizen</h2>
+        <div class="note-board">
+            <div *ngFor="let note of noteService.pinnedNotes">
+                <app-note [note]="note"></app-note>
+            </div>
+        </div>
     </div>
 
-    <h2>Nicht angepinnte Notizen</h2>
-    <div *ngFor="let note of noteService.unpinnedNotes">
-        <app-note [note]="note"></app-note>
+    <div class="note-board">
+        <div *ngFor="let note of noteService.unpinnedNotes">
+            <app-note [note]="note"></app-note>
+        </div>
     </div>
 </div>

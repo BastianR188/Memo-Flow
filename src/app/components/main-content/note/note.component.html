@@ -6,10 +6,15 @@
     Anhänge-Verwaltung -->
 
 <!-- note.component.html -->
-<div [style.background-color]="note.color">
-    <span>{{ note.isPinned ? '📌' : '' }}</span>
-    <button (click)="togglePinNote();saveNote()">Pinnen</button>
-
+<div [style.background-color]="note.color" class="note-main-container">
+    <div *ngIf="!note.delete">
+        <span class="pinn">
+            <img *ngIf="note.isPinned" class="icon" (click)="togglePinNote();saveNote()"
+                src="assets/icons/pin-black.svg" alt="Pinned">
+            <img *ngIf="!note.isPinned" class="icon" (click)="togglePinNote();saveNote()"
+                src="assets/icons/pin-white.svg" alt="Not pinned">
+        </span>
+    </div>
     <app-editing-note *ngIf="isEditing && editedNote" [note]="editedNote" (save)="saveNote()"
         (cancel)="abortEditNote()">
     </app-editing-note>
@@ -18,56 +23,76 @@
         <h3>{{ note.title }} </h3>
         <p *ngIf="!note.isChecklist">{{ note.content }}</p>
         <ng-container *ngIf="note.isChecklist">
-            <ul cdkDropList (cdkDropListDropped)="onDrop($event, false);saveNote()">
-                <li *ngFor="let item of uncheckedItems; let i = index" cdkDrag>
+            <div cdkDropList (cdkDropListDropped)="onDrop($event, false);saveNote()">
+                <div *ngFor="let item of uncheckedItems; let i = index" cdkDrag>
                     <div class="drag-handle">⋮</div>
                     <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(item.id);saveNote()">
                     <span>{{ item.text }}</span>
-                </li>
-            </ul>
+                </div>
+            </div>
             <div *ngIf="checkedItems.length > 0" class="completed-items">
-                <button (click)="toggleCompletedItems()" class="toggle-button">
+                <!-- <button (click)="toggleCompletedItems()" class="toggle-button">
                     {{ isCompletedItemsVisible ? '▼' : '▶' }}
                 </button>
-                {{ checkedItems.length }} Abgeschlossene {{ checkedItems.length === 1 ? 'Element' : 'Elemente' }}
+                {{ checkedItems.length }} Abgeschlossene {{ checkedItems.length === 1 ? 'Element' : 'Elemente' }} -->
             </div>
-            <ul *ngIf="isCompletedItemsVisible" cdkDropList (cdkDropListDropped)="onDrop($event, true);saveNote()">
-                <li *ngFor="let item of checkedItems; let i = index" cdkDrag>
-                    <div class="drag-handle">⋮</div>
-                    <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(item.id);saveNote()">
-                    <span class="completed">{{ item.text }}</span>
-                </li>
-            </ul>
+            <div *ngIf="isCompletedItemsVisible" cdkDropList (cdkDropListDropped)="onDrop($event, true);saveNote()">
+            <div *ngFor="let item of checkedItems; let i = index" cdkDrag>
+                <div class="drag-handle">⋮</div>
+                <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(item.id);saveNote()">
+                <span class="completed">{{ item.text }}</span>
+            </div>
+            </div> 
         </ng-container>
-        <button (click)="editNote()">Bearbeiten</button>
+    </div>
+
+
+
+
+    <div *ngIf="note.attachments.length > 0">
+        <div *ngFor="let attachment of note.attachments; let i = index" class="main-attachment">
+            <img [src]="attachment.url" alt="Attachment" style="max-width: 200px; max-height: 200px;">
+            <img class="icon close" (click)="removeAttachment(attachment.id); saveNote()" src=".\assets\icons\close.svg"
+                alt="">
+        </div>
     </div>
 
     <div>
-        <div class="color-selector" (click)="toggleDropdown()">
-            <img class="icon" [style.backgroundColor]="selectedColor" src="assets/icons/color-white.svg" alt="">
-            <div class="dropdown-menu" *ngIf="isDropdownOpen">
-                <div *ngFor="let color of colors" class="dropdown-item icon" [style.backgroundColor]="color.value"
-                    (click)="selectColor(color.value);toggleDropdown();saveNote()">
+        <div *ngIf="!note.delete" class="footer-note">
+            <div>
+                <div class="color-selector" (click)="toggleDropdown()">
+                    <img class="icon" src="assets/icons/color-white.svg" alt="">
+                    <div class="dropdown-menu" *ngIf="isDropdownOpen">
+                        <div *ngFor="let color of colors" class="dropdown-item icon"
+                            [style.backgroundColor]="color.value"
+                            (click)="selectColor(color.value);toggleDropdown();saveNote()">
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div>
+                <img class="icon" src="assets/icons/img-white.svg" alt="" (click)="fileInput.click()">
+                <input type="file" #fileInput (change)="onFileSelected($event);this.saveNote()" multiple
+                    accept="image/*" style="display: none;">
+            </div>
+
+            <button mat-button [matMenuTriggerFor]="menu" class="nopad"><img class="icon"
+                    src=".\assets\icons\menu-vertical.svg" alt=""></button>
+            <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="editNote()">Bearbeiten</button>
+                <button mat-menu-item (click)="deleteNote()">Papierkorb verschieben</button>
+            </mat-menu>
+        </div>
+        <div *ngIf="note.delete" class="footer-note">
+            <button (click)="noteService.deleteNotePermanently(note.id)">Endgültig Löschen</button>
+            <button (click)="noteService.restoreNoteFromTrash(note)">Wiederherstellen</button>
         </div>
     </div>
-
-    <input type="file" (change)="onFileSelected($event);this.saveNote()" accept="image/*" multiple #fileInput>
-
-    <div *ngIf="note.attachments.length > 0">
-        <h4>Anhänge:</h4>
-        <div *ngFor="let attachment of note.attachments; let i = index">
-            <img [src]="attachment.url" alt="Attachment" style="max-width: 200px; max-height: 200px;">
-            <p>{{ attachment.name }} ({{ attachment.size | number }} bytes)</p>
-            <button (click)="removeAttachment(attachment.id); saveNote()">Entfernen</button>
-        </div>
-    </div>
-    <button (click)="deleteNote()">Löschen</button>
-    <ng-container *ngIf="note.editAt == null; else edited">
+    <!-- <ng-container *ngIf="note.editAt == null; else edited">
         <p>Erstellt am: {{ note.createdAt | date:'medium' }}</p>
     </ng-container>
     <ng-template #edited>
-        <p>Bearbeitet am: {{ note.editAt | date:'medium' }}</p>
-    </ng-template>
+        <span>Bearbeitet am:</span>
+        <p>{{ note.editAt | date:'medium' }}</p>
+    </ng-template> -->
 </div>

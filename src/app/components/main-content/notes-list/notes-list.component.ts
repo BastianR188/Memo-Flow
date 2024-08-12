@@ -40,6 +40,20 @@ export class NotesListComponent implements OnInit {
   }
 
   async createNote() {
+    const hasContent = this.isChecklist
+      ? this.checklistItems.some(item => item.text.length > 0)
+      : this.note.length > 0;
+  
+    if (this.title.length === 0 && !hasContent) {
+      return this.resetForm();
+    }
+  
+    await this.noteService.addNote(this.newNote());
+    this.resetForm();
+  }
+  
+
+  newNote() {
     const newNote: Note = {
       id: this.noteService.newId(),
       title: this.title,
@@ -53,9 +67,7 @@ export class NotesListComponent implements OnInit {
       editAt: null,
       delete: false
     };
-
-    await this.noteService.addNote(newNote);
-    this.resetForm();
+    return newNote;
   }
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;

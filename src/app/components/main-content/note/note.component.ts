@@ -5,14 +5,13 @@ import { CdkDragDrop, CdkDropList, CdkDrag, moveItemInArray } from '@angular/cdk
 import { FormsModule } from '@angular/forms';
 import { AttachmentService } from '../../../services/attachment.service';
 import { NoteService } from '../../../services/note.service';
-import { ChecklistService } from '../../../services/checklist.service';
 import { ColorService } from '../../../services/color.service';
 import { EditingNoteComponent } from "../editing-note/editing-note.component";
-
+import { MatMenuModule } from '@angular/material/menu';
 @Component({
   selector: 'app-note',
   standalone: true,
-  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule, EditingNoteComponent],
+  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule, EditingNoteComponent, MatMenuModule],
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.scss']
 })
@@ -29,7 +28,7 @@ export class NoteComponent implements OnInit {
   colors: { name: string, value: string }[] = []; // Array für die Farben
 
   constructor(
-    private noteService: NoteService,
+    public noteService: NoteService,
     private attachmentService: AttachmentService,
     private colorService: ColorService // Injektion des ColorService,
   ) { }
