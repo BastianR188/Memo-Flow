@@ -44,6 +44,15 @@ ul.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
     margin-right: 10px;
 }
 
+.text {
+    white-space: pre-wrap;
+}
+
+.text-ceckbox-container {
+    display: flex;
+    align-items: center;
+}
+
 ul {
     list-style-type: none;
 }
@@ -56,6 +65,7 @@ ul {
     padding: 16px;
     overflow-wrap: break-word;
     word-wrap: break-word;
+    transition: all 0.3s ease;
 
     .pinn {
         position: absolute;
@@ -76,6 +86,7 @@ ul {
         background-color: rgba(255, 255, 255, 0.4);
         opacity: 0;
         transition: opacity 0.15s ease, transform 0.15s ease-in-out; // Kombinierte Transition
+
         &:hover {
             transform: scale(1.2);
         }

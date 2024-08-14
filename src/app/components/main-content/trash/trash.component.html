@@ -1,8 +1,10 @@
-<button (click)="deleteAllNotes()">Papierkorb leeren</button>
-<div class="main-note-board">
-    <div class="note-board">
-        <div *ngFor="let note of noteService.deletedNotes">
-            <app-note [note]="note"></app-note>
+<div class="trash-container">
+    <button (click)="deleteAllNotes()" class="trash-button">Papierkorb leeren</button>
+    <div class="main-note-board">
+        <div class="note-board">
+            <div *ngFor="let note of noteService.deletedNotes">
+                <app-note [note]="note"></app-note>
+            </div>
         </div>
     </div>
 </div>

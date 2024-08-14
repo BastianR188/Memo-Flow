@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NoteService } from '../../../services/note.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-side-menu',
@@ -9,12 +10,16 @@ import { NoteService } from '../../../services/note.service';
   styleUrl: './side-menu.component.scss'
 })
 export class SideMenuComponent {
-  constructor(private noteService: NoteService){}
-  goToTrash(){
+  constructor(private noteService: NoteService, private router: Router) { }
+  goToTrash() {
     this.noteService.openTrash = true;
   }
 
-  goToNote(){
+  goToNote() {
     this.noteService.openTrash = false;
+  }
+
+  goToLogin() {
+    this.router.navigate(['']);
   }
 }

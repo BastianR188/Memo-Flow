@@ -8,10 +8,11 @@ import { NoteService } from '../../../services/note.service';
 import { ColorService } from '../../../services/color.service';
 import { EditingNoteComponent } from "../editing-note/editing-note.component";
 import { MatMenuModule } from '@angular/material/menu';
+import { ClickOutsideDirective } from '../../../services/click-outside.directive';
 @Component({
   selector: 'app-note',
   standalone: true,
-  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule, EditingNoteComponent, MatMenuModule],
+  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule, EditingNoteComponent, MatMenuModule, ClickOutsideDirective],
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.scss']
 })
@@ -19,6 +20,7 @@ export class NoteComponent implements OnInit {
   @Input() note!: Note;
   @Output() pinStatusChanged = new EventEmitter<void>();
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
   selectedColor: string = 'white'; // Standardfarbe, falls gewünscht
   isDropdownOpen: boolean = false;
   editedNote: Note | null = null;
@@ -56,13 +58,13 @@ export class NoteComponent implements OnInit {
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
-  @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
     const target = event.target as HTMLElement;
     if (!target.closest('.color-selector')) {
       this.isDropdownOpen = false;
     }
   }
+
   selectColor(color: string) {
     this.note.color = color;
     this.isDropdownOpen = false;

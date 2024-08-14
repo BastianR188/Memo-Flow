@@ -15,19 +15,19 @@
                 src="assets/icons/pin-white.svg" alt="Not pinned">
         </span>
     </div>
-    <app-editing-note *ngIf="isEditing && editedNote" [note]="editedNote" (save)="saveNote()"
-        (cancel)="abortEditNote()">
+    <app-editing-note *ngIf="isEditing && editedNote" [note]="editedNote" (save)="saveNote()" (cancel)="abortEditNote()"
+        (clickOutside)="abortEditNote()">
     </app-editing-note>
 
     <div *ngIf="!isEditing">
-        <h3>{{ note.title }} </h3>
-        <p *ngIf="!note.isChecklist">{{ note.content }}</p>
+        <h3 class="text">{{ note.title }} </h3>
+        <p *ngIf="!note.isChecklist" class="text">{{ note.content }}</p>
         <ng-container *ngIf="note.isChecklist">
             <div cdkDropList (cdkDropListDropped)="onDrop($event, false);saveNote()">
-                <div *ngFor="let item of uncheckedItems; let i = index" cdkDrag>
+                <div *ngFor="let item of uncheckedItems; let i = index" cdkDrag class="text-ceckbox-container">
                     <div class="drag-handle">⋮</div>
                     <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(item.id);saveNote()">
-                    <span>{{ item.text }}</span>
+                    <span class="text">{{ item.text }}</span>
                 </div>
             </div>
             <div *ngIf="checkedItems.length > 0" class="completed-items">
@@ -37,12 +37,12 @@
                 {{ checkedItems.length }} Abgeschlossene {{ checkedItems.length === 1 ? 'Element' : 'Elemente' }} -->
             </div>
             <div *ngIf="isCompletedItemsVisible" cdkDropList (cdkDropListDropped)="onDrop($event, true);saveNote()">
-            <div *ngFor="let item of checkedItems; let i = index" cdkDrag>
-                <div class="drag-handle">⋮</div>
-                <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(item.id);saveNote()">
-                <span class="completed">{{ item.text }}</span>
+                <div *ngFor="let item of checkedItems; let i = index" cdkDrag>
+                    <div class="drag-handle">⋮</div>
+                    <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(item.id);saveNote()">
+                    <span class="completed">{{ item.text }}</span>
+                </div>
             </div>
-            </div> 
         </ng-container>
     </div>
 
@@ -60,7 +60,7 @@
     <div>
         <div *ngIf="!note.delete" class="footer-note">
             <div>
-                <div class="color-selector" (click)="toggleDropdown()">
+                <div class="color-selector" (click)="toggleDropdown()" (clickOutside)="this.isDropdownOpen = false;">
                     <img class="icon" src="assets/icons/color-white.svg" alt="">
                     <div class="dropdown-menu" *ngIf="isDropdownOpen">
                         <div *ngFor="let color of colors" class="dropdown-item icon"
@@ -88,11 +88,12 @@
             <button (click)="noteService.restoreNoteFromTrash(note)">Wiederherstellen</button>
         </div>
     </div>
-    <!-- <ng-container *ngIf="note.editAt == null; else edited">
-        <p>Erstellt am: {{ note.createdAt | date:'medium' }}</p>
+    <ng-container *ngIf="note.editAt == null; else edited">
+        <div>Erstellt am: </div>
+        <div>{{ note.createdAt | date:'medium' }}</div>
     </ng-container>
     <ng-template #edited>
-        <span>Bearbeitet am:</span>
-        <p>{{ note.editAt | date:'medium' }}</p>
-    </ng-template> -->
+        <div>Bearbeitet am:</div>
+        <div>{{ note.editAt | date:'medium' }}</div>
+    </ng-template>
 </div>

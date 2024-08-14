@@ -1,13 +1,13 @@
 <div>
-    <input type="text" [(ngModel)]="note.title" placeholder="Title">
+    <textarea  [style.background-color]="note.color" type="text"  class="input-title" autosize [(ngModel)]="note.title" placeholder="Title"></textarea>
 
     <div *ngIf="!note.isChecklist">
-        <input type="text" [(ngModel)]="note.content" placeholder="Note">
+        <textarea [style.background-color]="note.color" type="text"  class="input-content" autosize [(ngModel)]="note.content" placeholder="Note"></textarea>
     </div>
 
     <div *ngIf="note.isChecklist">
         <div *ngFor="let item of note.checklistItems; let i = index">
-            <input type="text" [(ngModel)]="note.checklistItems[i].text" placeholder="Checklist Item">
+            <textarea [style.background-color]="note.color" type="text"  class="input-content" autosize [(ngModel)]="note.checklistItems[i].text" placeholder="Checklist Item"></textarea>
             <input type="checkbox" [(ngModel)]="note.checklistItems[i].checked">
             <button (click)="removeChecklistItem(item.id)">Remove</button>
         </div>

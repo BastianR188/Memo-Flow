@@ -1,0 +1,11 @@
+.main{
+    display: flex;
+    flex-direction: column;
+    max-width: 120px;
+    gap: 16px;
+    padding: 24px;
+}
+button {
+    height: 36px;
+    cursor: pointer;
+}

@@ -7,11 +7,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NoteComponent } from '../note/note.component';
 import { ColorService } from '../../../services/color.service';
+import { AutosizeModule } from 'ngx-autosize';
 
 @Component({
   selector: 'app-notes-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, NoteComponent],
+  imports: [CommonModule, FormsModule, NoteComponent, AutosizeModule],
   templateUrl: './notes-list.component.html',
   styleUrls: ['./notes-list.component.scss']
 })
@@ -43,15 +44,15 @@ export class NotesListComponent implements OnInit {
     const hasContent = this.isChecklist
       ? this.checklistItems.some(item => item.text.length > 0)
       : this.note.length > 0;
-  
+
     if (this.title.length === 0 && !hasContent) {
       return this.resetForm();
     }
-  
+
     await this.noteService.addNote(this.newNote());
     this.resetForm();
   }
-  
+
 
   newNote() {
     const newNote: Note = {

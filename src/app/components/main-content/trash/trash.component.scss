@@ -1,0 +1,9 @@
+.trash-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.trash-button{
+    max-width: 500px;
+    cursor: pointer;
+}

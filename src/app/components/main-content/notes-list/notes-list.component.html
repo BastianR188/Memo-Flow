@@ -3,60 +3,72 @@
     Implementiert Sortierung (gepinnte Elemente oben)
     Filterfunktion nach Labels -->
 <div class="main-input-container">
-    <div class="input-container">
+    <div class="input-container" [style.backgroundColor]="selectedColor" >
         <div class="input-box">
-            <div>
-                <input class="input-title" type="text" [(ngModel)]="title" placeholder="Title">
-                <label>
+            <div class="input-line">
+                <textarea  [style.backgroundColor]="selectedColor" class="input-title" autosize type="text" [(ngModel)]="title" placeholder="Title"
+                    rows="1"></textarea>
+                <label class="input-checkbox">
                     <input type="checkbox" [(ngModel)]="isPinned"> Anpinnen
                 </label>
             </div>
             <div class="input-content-container">
-                <div *ngIf="!isChecklist">
-                    <input class="input-content" type="text" [(ngModel)]="note" placeholder="Note">
-                    <label>
+                <div *ngIf="!isChecklist" class="input-line">
+                    <textarea  [style.backgroundColor]="selectedColor" class="input-content" autosize type="text" [(ngModel)]="note" placeholder="Note"
+                        rows="1"></textarea>
+                    <label class="input-checkbox">
                         <input type="checkbox" [(ngModel)]="isChecklist" (click)="addChecklistItem()"> Checkliste
                     </label>
-    
+
                 </div>
                 <div *ngIf="isChecklist">
-                    <div *ngFor="let item of checklistItems; let i = index">
-                        <input class="input-content" type="text" [(ngModel)]="checklistItems[i].text" placeholder="Checklist Item">
-                        <input type="checkbox" [(ngModel)]="checklistItems[i].checked">
-                        <button (click)="removeChecklistItem(item.id)">Remove</button>
-                    </div>
-                    <button (click)="addChecklistItem()">Add Checklist Item</button>
-                    <label>
-                        <input type="checkbox" [(ngModel)]="isChecklist"> Checkliste
-                    </label>
+                    <div *ngFor="let item of checklistItems; let i = index" class="input-line">
+                        <textarea  [style.backgroundColor]="selectedColor" class="input-content" autosize type="text" [(ngModel)]="checklistItems[i].text"
+                            placeholder="Checklist Item" rows="1"></textarea>
+                        <div class="input-checkbox">
+                            <input type="checkbox" [(ngModel)]="checklistItems[i].checked">
+                            <button (click)="removeChecklistItem(item.id)">Remove</button>
+                        </div>
 
+                    </div>
+                    <div class="input-line">
+                        <button (click)="addChecklistItem()">Add Checklist Item</button>
+                        <label class="input-checkbox">
+                            <input type="checkbox" [(ngModel)]="isChecklist"> Checkliste
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
-
         <div class="input-footer-container">
-            <div class="color-selector" (click)="toggleDropdown()">
-                <img class="icon" [style.backgroundColor]="selectedColor" src="assets/icons/color-white.svg" alt="">
-                <div class="dropdown-menu" *ngIf="isDropdownOpen">
-                    <div *ngFor="let color of colors" class="dropdown-item icon" [style.backgroundColor]="color.value"
-                        (click)="selectColor(color.value);toggleDropdown()">
+            <div class="footer-menu-container">
+                <div class="icon"></div>
+
+                <div class="color-selector" (click)="toggleDropdown()">
+                    <img class="icon" src="assets/icons/color-white.svg" alt="">
+                    <div class="dropdown-menu" *ngIf="isDropdownOpen">
+                        <div *ngFor="let color of colors" class="dropdown-item icon"
+                            [style.backgroundColor]="color.value" (click)="selectColor(color.value);toggleDropdown()">
+                        </div>
                     </div>
                 </div>
+
+                <div>
+                    <img class="icon" src="assets/icons/img-white.svg" alt="" (click)="fileInput.click()">
+                    <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*"
+                        style="display: none;">
+                </div>
+
+                <div class="image-preview">
+                    <img *ngFor="let imageUrl of imageUrls" [src]="imageUrl" alt="Selected Image" class="preview-image">
+                </div>
+
+
             </div>
-
-            <div>
-                <img class="icon" src="assets/icons/img-white.svg" alt="" (click)="fileInput.click()">
-                <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*"
-                    style="display: none;">
+            <div class="footer-menu-container">
+                <button class="icon" (click)="createNote()">OK</button>
+                <div class="icon"></div>
             </div>
-
-            <div class="image-preview">
-                <img *ngFor="let imageUrl of imageUrls" [src]="imageUrl" alt="Selected Image" class="preview-image">
-            </div>
-
-
-
-            <button class="icon" (click)="createNote()">OK</button>
         </div>
     </div>
 </div>

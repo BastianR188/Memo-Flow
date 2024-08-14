@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Note } from '../../../model/note';
 import { ChecklistService } from '../../../services/checklist.service';
+import { AutosizeModule } from 'ngx-autosize';
 
 @Component({
   selector: 'app-editing-note',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AutosizeModule],
   templateUrl: './editing-note.component.html',
   styleUrls: ['./editing-note.component.scss']
 })
