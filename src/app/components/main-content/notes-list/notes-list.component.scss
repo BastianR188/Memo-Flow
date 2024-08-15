@@ -1,14 +1,28 @@
+.input-title {
+    border: none;
+    font-size: 32px;
+    overflow: hidden;
+    resize: none;
+    width: -webkit-fill-available;
+    transition: all 0.3s ease;
+
+}
+
+.title-box {
+    margin: 8px 16px 0 16px;
+}
+
 .main-input-container {
     width: 100%;
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
+
     .input-line {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        width: 100%;
     }
 
     .input-content-container {
@@ -20,7 +34,7 @@
 
     .input-container {
         border: solid 1px;
-        padding: 8px;
+        margin: 8px;
         border-radius: 24px;
         width: 80%;
         max-width: 1024px;
@@ -28,18 +42,20 @@
         flex-direction: column;
         gap: 16px;
         transition: all 0.3s ease;
+        padding-bottom: 16px;
     }
 
     .image-preview {
         display: flex;
         flex-wrap: wrap;
-        margin-top: 10px;
+        margin: 10px 24px 0 24px;
+
     }
 
     .preview-image {
-        width: 100px;
+        max-width: 480px;
         /* Beispielgröße */
-        height: 100px;
+        max-height: 480px;
         /* Beispielgröße */
         object-fit: cover;
         margin-right: 10px;
@@ -52,14 +68,64 @@
         gap: 15px;
     }
 }
-.footer-menu-container{
+
+.add-checklist {
+    text-wrap: nowrap;
     display: flex;
-    gap: 16px;
+    gap: 8px;
+    padding: 8px 32px;
+    align-items: center;
 }
+
+.outerbox {
+    position: relative;
+    margin: 8px 32px;
+    border: 1px solid #ccc; 
+    transition: border 0.3s ease; 
+    border: none;
+    &:focus-within {
+        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .checkbox {
+        position: absolute;
+    }
+
+    .textbox {
+        margin: 8px 40px;
+        width: calc(100% - 80px)
+    }
+
+    .closebox {
+        position: absolute;
+        right: 0;
+        cursor: pointer;
+        opacity: 0;
+        transition: all 0.2s ease-in-out;
+    }
+
+    &:hover {
+        .closebox {
+            opacity: 1;
+        }
+    }
+
+    // Zeige den Remove-Button, wenn das Textarea fokussiert ist
+    .textbox:focus+.closebox {
+        opacity: 1;
+
+    }
+}
+
+.footer-menu-container {
+    display: flex;
+    gap: 32px;
+}
+
 .input-box {
     display: flex;
     flex-direction: column;
     width: 100%;
     align-content: space-between;
-    gap: 8px;
 }

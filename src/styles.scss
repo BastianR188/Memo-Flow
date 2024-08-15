@@ -1,15 +1,47 @@
 /* You can add global styles to this file, and also import other style files */
+// Variablen für einfache Anpassung
+$base-color: rgba(0, 0, 0, 0.1);
+$hover-color: darken($base-color, 1%);
+$shadow-color: rgba(0, 0, 0, 0.2);
+$transition-time: 0.3s;
+
+.cool-shadow-box {
+    // Basis-Schatteneffekt
+    // box-shadow:
+    // 0 10px 20px $shadow-color,
+    // 0 6px 6px $shadow-color;
+
+    // Hover-Effekt
+    &:hover {
+        background-color: $hover-color;
+        // transform: translateY(-5px) scale(1.01);
+        box-shadow:
+            0 10px 20px $shadow-color,
+            0 6px 6px $shadow-color;
+    }
+
+    // Aktiv-Effekt (beim Klicken)
+    // &:active {
+    //     transform: translateY(-3px) scale(0.99);
+    //     box-shadow:
+    //         10px 10px 20px $shadow-color,
+    //         -10px -10px 20px lighten($shadow-color, 5%),
+    //         inset 0 0 5px rgba(255, 255, 255, 0.2);
+    // }
+}
 
 html,
 body {
     height: 100%;
 
 }
+
+textarea,
 input {
     outline: none;
     border: none;
-    padding: 8px;
 }
+
 body {
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
@@ -20,6 +52,8 @@ img {
 }
 
 .icon {
+    display: flex;
+    align-items: center;
     height: 32px;
     width: 32px;
     border-radius: 50%;
@@ -29,6 +63,17 @@ img {
     &:hover {
         transform: scale(1.2);
     }
+}
+
+.checklist-area-border {
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.checklist-area-border:focus {
+    border-top: solid 1px rgba(0, 0, 0, 0.2);
+    ;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.2);
+    ;
 }
 
 .color-selector {
@@ -47,6 +92,10 @@ img {
     z-index: 1000;
     padding: 8px;
     border-radius: 24px;
+    gap: 4px;
+    box-shadow:
+        0 10px 20px $shadow-color,
+        0 6px 6px $shadow-color;
 }
 
 .dropdown-item {
@@ -76,28 +125,14 @@ img {
     }
 }
 
-.input-title {
-    border: none;
-    padding: 8px;
-    font-size: 32px;
-    overflow: hidden;
-    resize: none;
-    width: -webkit-fill-available;
-    transition: all 0.3s ease;
 
-}
 
 .input-content {
     border: none;
-    padding: 8px;
     font-size: 24px;
     width: -webkit-fill-available;
     overflow: hidden;
     resize: none;
     transition: all 0.3s ease;
 
-}
-.input-checkbox{
-    display: flex;
-    width: 110px;
 }

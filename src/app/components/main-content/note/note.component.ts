@@ -37,6 +37,7 @@ export class NoteComponent implements OnInit {
 
   ngOnInit() {
     this.colors = this.colorService.getColors(); // Lade die Farben
+    this.sortOrder()
   }
 
   get uncheckedItems(): ChecklistItem[] {
@@ -49,12 +50,16 @@ export class NoteComponent implements OnInit {
 
   onDrop(event: CdkDragDrop<ChecklistItem[]>, isCheckedList: boolean) {
     const itemList = isCheckedList ? this.checkedItems : this.uncheckedItems;
+    this.setOrder(itemList, event);
+    this.updateChecklistOrder();
+  }
+  private setOrder(itemList: ChecklistItem[], event: CdkDragDrop<ChecklistItem[], ChecklistItem[], any>) {
     moveItemInArray(itemList, event.previousIndex, event.currentIndex);
     itemList.forEach((item, index) => {
       item.order = index;
     });
-    this.updateChecklistOrder();
   }
+
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
@@ -77,8 +82,26 @@ export class NoteComponent implements OnInit {
   onCheckboxChange(itemId: string) {
     const item = this.note.checklistItems.find(i => i.id === itemId);
     if (item) {
-      this.updateChecklistOrder();
+      console.log(item.checked)
+      this.sortOrder()
+      if (item.checked == false) {
+        item.checked = true;
+        item.order = 0;
+      } else {
+        item.checked = false;
+        item.order = this.uncheckedItems.length;
+      }
+      this.updateChecklistOrder()
     }
+  }
+
+  sortOrder() {
+    this.uncheckedItems.forEach((item, index) => {
+      item.order = index;
+    });
+    this.checkedItems.forEach((item, index) => {
+      item.order = index + 1;
+    })
   }
 
   togglePinNote() {

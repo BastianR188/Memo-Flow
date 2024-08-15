@@ -1,4 +1,4 @@
-<div>
+<!-- <div>
     <textarea  [style.background-color]="note.color" type="text"  class="input-title" autosize [(ngModel)]="note.title" placeholder="Title"></textarea>
 
     <div *ngIf="!note.isChecklist">
@@ -16,4 +16,80 @@
 
     <button (click)="saveNote()">Speichern</button>
     <button (click)="abortEditNote()">Abbrechen</button>
+</div> -->
+
+<div class="main-input-container">
+    <div class="input-container" [style.backgroundColor]="note.color">
+        <div class="input-box">
+            <div class="input-line title-box">
+                <textarea [style.backgroundColor]="note.color" class="input-title" autosize type="text"
+                    [(ngModel)]="note.title" placeholder="Title" rows="1"></textarea>
+                <span class="pinn">
+                    <img *ngIf="note.isPinned" class="icon" (click)="note.isPinned = false" src="assets/icons/pin-black.svg"
+                        alt="Pinned">
+                    <img *ngIf="!note.isPinned" class="icon" (click)="note.isPinned = true" src="assets/icons/pin-white.svg"
+                        alt="Not pinned">
+                </span>
+            </div>
+            <div class="input-content-container">
+                <div *ngIf="!note.isChecklist" class="input-line title-box">
+                    <textarea [style.backgroundColor]="note.color" class="input-content" autosize type="text"
+                        [(ngModel)]="note" placeholder="Note" rows="1"></textarea>
+                    <label class="input-checkbox">
+                        <input type="checkbox" [(ngModel)]="note.isChecklist"
+                            (change)="note.checklistItems.length === 0 && addChecklistItem()"> Checkliste
+                    </label>
+
+                </div>
+                <div *ngIf="note.isChecklist">
+                    <div *ngFor="let item of note.checklistItems; let i = index"
+                        class="input-line outerbox checklist-area-border">
+                        <img [src]="item.checked ? './assets/icons/checkbox-check.svg' : './assets/icons/checkbox-unchecked.svg'"
+                            (click)="note.checklistItems[i].checked = !note.checklistItems[i].checked" class="icon checkbox"
+                            [alt]="item.checked ? 'Checked' : 'Unchecked'">
+                        <textarea #textArea [id]="'item-' + item.id" [style.backgroundColor]="note.color"
+                            class="input-content textbox checklist-area-input" autosize type="text"
+                            [(ngModel)]="note.checklistItems[i].text" placeholder="Checklist Item" rows="1"></textarea>
+                        <div class="closebox">
+                            <img class="icon close" (click)="removeChecklistItem(item.id)"
+                                src=".\assets\icons\close.svg" alt="">
+                        </div>
+
+                    </div>
+                    <div class="icon add-checklist" (click)="addChecklistItem()">
+                        <img width="32px" height="32px" src=".\assets\icons\add-row.svg" alt="">Liste hinzufügen
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div *ngIf="imageUrls.length != 0" class="image-preview">
+            <img *ngFor="let imageUrl of imageUrls" [src]="imageUrl" alt="Selected Image" class="preview-image">
+        </div> -->
+        <div class="input-footer-container">
+            <div class="footer-menu-container">
+                <div class="icon"></div>
+
+                <!-- <div>
+                    <div class="color-selector" (click)="toggleDropdown()"
+                        (clickOutside)="this.isDropdownOpen = false;">
+                        <img class="icon" src="assets/icons/color-white.svg" alt="">
+                        <div class="dropdown-menu" *ngIf="isDropdownOpen">
+                            <div *ngFor="let color of colors" class="dropdown-item icon"
+                                [style.backgroundColor]="color.value"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+
+
+
+
+            </div>
+            <div class="footer-menu-container">
+                <div class="icon" ><strong>Speichern</strong></div>
+                <div class="icon"></div>
+            </div>
+        </div>
+    </div>
 </div>

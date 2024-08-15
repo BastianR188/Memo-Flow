@@ -1,17 +1,10 @@
-<!-- Einzelne Notiz-Komponente
 
-    Anzeige und Bearbeitung von Notizen
-    Farbauswahl
-    Label-Verwaltung
-    Anhänge-Verwaltung -->
-
-<!-- note.component.html -->
-<div [style.background-color]="note.color" class="note-main-container">
+<div [style.background-color]="note.color" class="note-main-container cool-shadow-box">
     <div *ngIf="!note.delete">
         <span class="pinn">
-            <img *ngIf="note.isPinned" class="icon" (click)="togglePinNote();saveNote()"
+            <img *ngIf="note.isPinned" class="icon" style="margin-top: 12px;" (click)="togglePinNote();saveNote()"
                 src="assets/icons/pin-black.svg" alt="Pinned">
-            <img *ngIf="!note.isPinned" class="icon" (click)="togglePinNote();saveNote()"
+            <img *ngIf="!note.isPinned" class="icon date-footer" (click)="togglePinNote();saveNote()"
                 src="assets/icons/pin-white.svg" alt="Not pinned">
         </span>
     </div>
@@ -20,30 +13,36 @@
     </app-editing-note>
 
     <div *ngIf="!isEditing">
-        <h3 class="text">{{ note.title }} </h3>
+        <h3 class="text" *ngIf="note.title.length !=0">{{ note.title }} </h3>
         <p *ngIf="!note.isChecklist" class="text">{{ note.content }}</p>
+
         <ng-container *ngIf="note.isChecklist">
-            <div cdkDropList (cdkDropListDropped)="onDrop($event, false);saveNote()">
+            <div cdkDropList (cdkDropListDropped)="onDrop($event, false);saveNote()" >
                 <div *ngFor="let item of uncheckedItems; let i = index" cdkDrag class="text-ceckbox-container">
-                    <div class="drag-handle">⋮</div>
-                    <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(item.id);saveNote()">
+                    <img class="drag-handle drag-icon" src=".\assets\icons\drag-handle.svg" alt="">
+                    <img *ngIf="!item.checked" (click)="onCheckboxChange(item.id);saveNote()" class="icon"
+                        src=".\assets\icons\checkbox-unchecked.svg" alt="">
                     <span class="text">{{ item.text }}</span>
                 </div>
             </div>
-            <div *ngIf="checkedItems.length > 0" class="completed-items">
-                <!-- <button (click)="toggleCompletedItems()" class="toggle-button">
+            <div *ngIf="checkedItems.length > 0 && uncheckedItems.length > 0" class="stroke"></div>
+            <!-- <div *ngIf="checkedItems.length > 0" class="completed-items">
+                <button (click)="toggleCompletedItems()" class="toggle-button">
                     {{ isCompletedItemsVisible ? '▼' : '▶' }}
                 </button>
-                {{ checkedItems.length }} Abgeschlossene {{ checkedItems.length === 1 ? 'Element' : 'Elemente' }} -->
-            </div>
-            <div *ngIf="isCompletedItemsVisible" cdkDropList (cdkDropListDropped)="onDrop($event, true);saveNote()">
-                <div *ngFor="let item of checkedItems; let i = index" cdkDrag>
-                    <div class="drag-handle">⋮</div>
-                    <input type="checkbox" [(ngModel)]="item.checked" (change)="onCheckboxChange(item.id);saveNote()">
+                {{ checkedItems.length }} Abgeschlossene {{ checkedItems.length === 1 ? 'Element' : 'Elemente' }}
+            </div> -->
+            <div  cdkDropList (cdkDropListDropped)="onDrop($event, true);saveNote()"
+                >
+                <div *ngFor="let item of checkedItems; let i = index" cdkDrag class="text-ceckbox-container">
+                    <img class="drag-handle drag-icon" src=".\assets\icons\drag-handle.svg" alt="">
+                    <img *ngIf="item.checked" (click)="onCheckboxChange(item.id);saveNote()" class="icon"
+                        src=".\assets\icons\checkbox-check.svg" alt="">
                     <span class="completed">{{ item.text }}</span>
                 </div>
             </div>
         </ng-container>
+
     </div>
 
 
@@ -57,43 +56,52 @@
         </div>
     </div>
 
-    <div>
-        <div *ngIf="!note.delete" class="footer-note">
-            <div>
-                <div class="color-selector" (click)="toggleDropdown()" (clickOutside)="this.isDropdownOpen = false;">
-                    <img class="icon" src="assets/icons/color-white.svg" alt="">
-                    <div class="dropdown-menu" *ngIf="isDropdownOpen">
-                        <div *ngFor="let color of colors" class="dropdown-item icon"
-                            [style.backgroundColor]="color.value"
-                            (click)="selectColor(color.value);toggleDropdown();saveNote()">
+    <div class="date-footer">
+        <div class="footer">
+            <div *ngIf="!note.delete" class="footer-note">
+                <div>
+                    <div class="color-selector" (click)="toggleDropdown()"
+                        (clickOutside)="this.isDropdownOpen = false;">
+                        <img class="icon" src="assets/icons/color-white.svg" alt="">
+                        <div class="dropdown-menu" *ngIf="isDropdownOpen">
+                            <div *ngFor="let color of colors" class="dropdown-item icon"
+                                [style.backgroundColor]="color.value"
+                                (click)="selectColor(color.value);toggleDropdown();saveNote()">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div>
-                <img class="icon" src="assets/icons/img-white.svg" alt="" (click)="fileInput.click()">
-                <input type="file" #fileInput (change)="onFileSelected($event);this.saveNote()" multiple
-                    accept="image/*" style="display: none;">
-            </div>
+                <div>
+                    <img class="icon" src="assets/icons/img-white.svg" alt="" (click)="fileInput.click()">
+                    <input type="file" #fileInput (change)="onFileSelected($event);this.saveNote()" multiple
+                        accept="image/*" style="display: none;">
+                </div>
 
-            <button mat-button [matMenuTriggerFor]="menu" class="nopad"><img class="icon"
-                    src=".\assets\icons\menu-vertical.svg" alt=""></button>
-            <mat-menu #menu="matMenu">
-                <button mat-menu-item (click)="editNote()">Bearbeiten</button>
-                <button mat-menu-item (click)="deleteNote()">Papierkorb verschieben</button>
-            </mat-menu>
+                <button mat-button [matMenuTriggerFor]="menu" class="nopad"><img class="icon"
+                        src=".\assets\icons\menu-vertical.svg" alt=""></button>
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="editNote()">Bearbeiten</button>
+                    <button mat-menu-item (click)="deleteNote()">Papierkorb verschieben</button>
+                </mat-menu>
+            </div>
+            <div *ngIf="note.delete" class="footer-note">
+                <button (click)="noteService.deleteNotePermanently(note.id)">Endgültig Löschen</button>
+                <button (click)="noteService.restoreNoteFromTrash(note)">Wiederherstellen</button>
+            </div>
         </div>
-        <div *ngIf="note.delete" class="footer-note">
-            <button (click)="noteService.deleteNotePermanently(note.id)">Endgültig Löschen</button>
-            <button (click)="noteService.restoreNoteFromTrash(note)">Wiederherstellen</button>
+        <div class="date-stamp">
+            <ng-container *ngIf="note.editAt == null; else edited">
+                <div>
+                    <div>Erstellt am: </div>
+                    <div>{{ note.createdAt | date:'d MMM y, HH:mm' }} Uhr</div>
+                </div>
+            </ng-container>
+            <ng-template #edited>
+                <div>
+                    <div>Bearbeitet am:</div>
+                    <div>{{ note.editAt | date:'d MMM y, HH:mm' }} Uhr</div>
+                </div>
+            </ng-template>
         </div>
     </div>
-    <ng-container *ngIf="note.editAt == null; else edited">
-        <div>Erstellt am: </div>
-        <div>{{ note.createdAt | date:'medium' }}</div>
-    </ng-container>
-    <ng-template #edited>
-        <div>Bearbeitet am:</div>
-        <div>{{ note.editAt | date:'medium' }}</div>
-    </ng-template>
 </div>
