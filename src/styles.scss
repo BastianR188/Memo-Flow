@@ -84,8 +84,8 @@ img {
 
 .dropdown-menu {
     position: absolute;
-    top: 100%;
-    left: 0;
+    bottom: 16px;
+    left: 16px;
     display: flex;
     background-color: white;
     border: 1px solid #ccc;
@@ -118,7 +118,6 @@ img {
 
     .note-board {
         display: flex;
-        justify-content: center;
         width: 100%;
         flex-wrap: wrap;
         gap: 16px;
@@ -131,8 +130,20 @@ img {
     border: none;
     font-size: 24px;
     width: -webkit-fill-available;
+    width: -moz-available;
     overflow: hidden;
     resize: none;
+    transition: all 0.3s ease;
+
+}
+
+.input-title {
+    border: none;
+    font-size: 32px;
+    overflow: hidden;
+    resize: none;
+    width: -webkit-fill-available;
+    width: -moz-available;
     transition: all 0.3s ease;
 
 }

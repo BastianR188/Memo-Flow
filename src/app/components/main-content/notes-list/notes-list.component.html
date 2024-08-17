@@ -1,7 +1,3 @@
-<!-- Zeigt alle Notizen und Checklisten an
-
-    Implementiert Sortierung (gepinnte Elemente oben)
-    Filterfunktion nach Labels -->
 <div class="main-input-container">
     <div class="input-container" [style.backgroundColor]="selectedColor">
         <div class="input-box">
@@ -26,22 +22,25 @@
 
                 </div>
                 <div *ngIf="isChecklist">
-                    <div *ngFor="let item of checklistItems; let i = index"
-                        class="input-line outerbox checklist-area-border">
-                        <img [src]="item.checked ? './assets/icons/checkbox-check.svg' : './assets/icons/checkbox-unchecked.svg'"
-                            (click)="checklistItems[i].checked = !checklistItems[i].checked" class="icon checkbox"
-                            [alt]="item.checked ? 'Checked' : 'Unchecked'">
-                        <textarea #textArea [id]="'item-' + item.id" [style.backgroundColor]="selectedColor"
-                            class="input-content textbox checklist-area-input" autosize type="text"
-                            [(ngModel)]="checklistItems[i].text" placeholder="Checklist Item" rows="1"></textarea>
-                        <div class="closebox">
-                            <img class="icon close" (click)="removeChecklistItem(item.id)"
-                                src=".\assets\icons\close.svg" alt="">
+                    <div *ngFor="let item of checklistItems; let i = index" style="min-height: 58px;">
+                        <div class="input-line outerbox checklist-area-border">
+                            <img [src]="item.checked ? './assets/icons/checkbox-check.svg' : './assets/icons/checkbox-unchecked.svg'"
+                                (click)="checklistItems[i].checked = !checklistItems[i].checked" class="icon checkbox"
+                                [alt]="item.checked ? 'Checked' : 'Unchecked'">
+                            <textarea #textArea [id]="'item-' + item.id" [style.backgroundColor]="selectedColor"
+                                class="input-content textbox checklist-area-input" autosize type="text"
+                                [(ngModel)]="checklistItems[i].text" placeholder="Checklist Item" rows="1"></textarea>
+                            <div class="closebox">
+                                <img class="icon close" (click)="removeChecklistItem(item.id)"
+                                    src=".\assets\icons\close.svg" alt="">
+                            </div>
                         </div>
                     </div>
                     <div class="icon add-checklist" (click)="addChecklistItem()">
-                        <img width="32px" height="32px" src=".\assets\icons\add-row.svg" alt="">Listeneintrag hinzufügen
+                        <img width="32px" height="32px" src=".\assets\icons\add-row.svg" alt="">Listeneintrag
+                        hinzufügen
                     </div>
+
                 </div>
             </div>
         </div>
@@ -84,7 +83,7 @@
     </div>
 </div>
 <div class="main-note-board">
-    <div *ngIf="noteService.pinnedNotes.length != 0">
+    <div *ngIf="noteService.pinnedNotes.length != 0" style="width: 100%;">
         <h2>Angepinnte Notizen</h2>
         <div class="note-board">
             <div *ngFor="let note of noteService.pinnedNotes">
@@ -93,7 +92,7 @@
         </div>
     </div>
 
-    <div class="note-board">
+    <div class="note-board" style="width: 100%;">
         <div *ngFor="let note of noteService.unpinnedNotes">
             <app-note [note]="note"></app-note>
         </div>

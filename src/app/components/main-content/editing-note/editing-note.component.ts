@@ -32,4 +32,5 @@ export class EditingNoteComponent {
   removeChecklistItem(itemId: string) {
     this.checklistService.removeChecklistItem(this.note, itemId);
   }
+  
 }

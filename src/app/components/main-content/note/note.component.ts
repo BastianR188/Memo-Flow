@@ -9,10 +9,12 @@ import { ColorService } from '../../../services/color.service';
 import { EditingNoteComponent } from "../editing-note/editing-note.component";
 import { MatMenuModule } from '@angular/material/menu';
 import { ClickOutsideDirective } from '../../../services/click-outside.directive';
+import { ChecklistService } from '../../../services/checklist.service';
+import { AutosizeModule } from 'ngx-autosize';
 @Component({
   selector: 'app-note',
   standalone: true,
-  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule, EditingNoteComponent, MatMenuModule, ClickOutsideDirective],
+  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule, EditingNoteComponent, MatMenuModule, ClickOutsideDirective, AutosizeModule],
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.scss']
 })
@@ -21,9 +23,9 @@ export class NoteComponent implements OnInit {
   @Output() pinStatusChanged = new EventEmitter<void>();
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
+  isFullscreen: boolean = false;
   selectedColor: string = 'white'; // Standardfarbe, falls gewünscht
   isDropdownOpen: boolean = false;
-  editedNote: Note | null = null;
   isCompletedItemsVisible: boolean = true;
   isEditing: boolean = false;
   attachments: ImageAttachment[] = [];
@@ -32,7 +34,8 @@ export class NoteComponent implements OnInit {
   constructor(
     public noteService: NoteService,
     private attachmentService: AttachmentService,
-    private colorService: ColorService // Injektion des ColorService,
+    private colorService: ColorService,
+    private checklistService: ChecklistService
   ) { }
 
   ngOnInit() {
@@ -79,10 +82,11 @@ export class NoteComponent implements OnInit {
     this.note.checklistItems.sort((a, b) => a.order - b.order);
   }
 
-  onCheckboxChange(itemId: string) {
+  onCheckboxChange(event:any, itemId: string) {
+    event.stopPropagation();
+
     const item = this.note.checklistItems.find(i => i.id === itemId);
     if (item) {
-      console.log(item.checked)
       this.sortOrder()
       if (item.checked == false) {
         item.checked = true;
@@ -106,7 +110,7 @@ export class NoteComponent implements OnInit {
 
   togglePinNote() {
     this.note.isPinned = !this.note.isPinned;
-    this.pinStatusChanged.emit();
+    // this.pinStatusChanged.emit();
   }
 
   toggleCompletedItems() {
@@ -114,27 +118,21 @@ export class NoteComponent implements OnInit {
   }
 
   editNote() {
-    this.editedNote = { ...this.note };
     this.isEditing = true;
-    console.log('Dieser Note wird editiert:', this.editedNote)
+    this.isFullscreen = true;
   }
 
   abortEditNote() {
     this.isEditing = false;
-    this.editedNote = null;
+    this.isFullscreen = false;
+    this.checkIfEmpty();
+
   }
 
   async saveNote() {
-    if (this.editedNote) {
-      this.note = { ...this.editedNote };
-    }
-    this.isEditing = false;
     await this.noteService.updateNote(this.note);
-    this.pinStatusChanged.emit();
+    // this.pinStatusChanged.emit();
   }
-
-
-
 
   async onFileSelected(event: Event) {
     const element = event.currentTarget as HTMLInputElement;
@@ -147,14 +145,47 @@ export class NoteComponent implements OnInit {
     }
   }
 
-  removeAttachment(attachmentId: string) {
+  removeAttachment(event:any, attachmentId: string) {
+    event.stopPropagation();
     this.attachmentService.removeAttachmentFromNote(this.note, attachmentId);
+    this.checkIfEmpty()
   }
 
-
+  checkIfEmpty() {
+    if (this.note.attachments.length == 0 && this.note.title.length == 0 && this.note.content.length == 0 && this.note.checklistItems.length == 0) {
+      this.deleteNote();
+    }
+  }
 
   deleteNote() {
     this.note.editAt = new Date();
     this.noteService.moveToTrash(this.note);
+  }
+
+  addChecklistItem() {
+    const newItem: ChecklistItem = {
+      id: this.checklistService.generateUniqueId(),
+      text: '',
+      checked: false,
+      order: this.note.checklistItems.length
+    };
+    this.note.checklistItems.push(newItem);
+    setTimeout(() => {
+      this.focusNewItem(newItem.id);
+    });
+  }
+  focusNewItem(id: string): void {
+    setTimeout(() => {
+      const newItem = document.getElementById(`item-${id}`);
+      if (newItem) {
+        (newItem as HTMLTextAreaElement).focus();
+      }
+    });
+  }
+  removeChecklistItem(itemId: string) {
+    const index = this.note.checklistItems.findIndex(item => item.id === itemId);
+    if (index !== -1) {
+      this.note.checklistItems.splice(index, 1);
+    }
   }
 }

@@ -19,7 +19,7 @@ import { AutosizeModule } from 'ngx-autosize';
 export class NotesListComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @ViewChildren('textArea') textAreas!: QueryList<ElementRef>;
-  selectedColor: string = 'white'; // Standardfarbe, falls gewünscht
+  selectedColor: string = '#ffffff'; // Standardfarbe, falls gewünscht
   isDropdownOpen: boolean = false;
   imageUrls: string[] = [];
   userId: string = '';
@@ -51,7 +51,6 @@ export class NotesListComponent implements OnInit {
     if (this.title.length === 0 && !hasContent && !hasAttachment) {
       return this.resetForm();
     }
-  
     await this.noteService.addNote(this.newNote());
     this.resetForm();
   }
@@ -93,7 +92,7 @@ export class NotesListComponent implements OnInit {
     this.note = '';
     this.isChecklist = false;
     this.isPinned = false;
-    this.selectedColor = '';
+    this.selectedColor = '#ffffff';
     this.attachments = [];
     this.checklistItems = [];
     this.imageUrls = [];

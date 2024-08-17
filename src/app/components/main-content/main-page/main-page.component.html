@@ -1,7 +1,7 @@
 <div class="main">
     <app-side-menu class="side"></app-side-menu>
     <div class="content">
-        <app-notes-list *ngIf="!noteService.openTrash"></app-notes-list>
-        <app-trash *ngIf="noteService.openTrash"></app-trash>
+        <app-notes-list *ngIf="!noteService.openTrash" style="width: 100%;"></app-notes-list>
+        <app-trash *ngIf="noteService.openTrash" style="width: 100%;"></app-trash>
     </div>
 </div>
