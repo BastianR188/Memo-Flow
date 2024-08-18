@@ -136,6 +136,7 @@ export class NoteComponent implements OnInit {
   }
 
   async saveNote() {
+    console.log('dieser Note wird geupdatet', this.note)
     await this.noteService.updateNote(this.note);
     // this.pinStatusChanged.emit();
   }
@@ -145,6 +146,7 @@ export class NoteComponent implements OnInit {
     let fileList: FileList | null = element.files;
     if (fileList) {
       await this.attachmentService.addAttachmentsToNote(this.note, fileList);
+      this.saveNote();
       if (this.fileInput) {
         this.fileInput.nativeElement.value = '';
       }

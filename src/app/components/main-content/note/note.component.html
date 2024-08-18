@@ -136,7 +136,7 @@
                     </div>
                     <div>
                         <img class="icon" src="assets/icons/img-white.svg" alt="" (click)="fileInput.click()">
-                        <input type="file" #fileInput (change)="onFileSelected($event);this.saveNote()" multiple
+                        <input type="file" #fileInput (change)="onFileSelected($event)" multiple
                             accept="image/*" style="display: none;">
                     </div>
                     <div class="color-selector" (click)="toggleDropdown('menu')"

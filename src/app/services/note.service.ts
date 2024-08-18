@@ -42,7 +42,7 @@ export class NoteService {
   async addNote(note: Note): Promise<void> {
     if (!this.userId) throw new Error('User not set');
     this.notes.push(note);
-    await this.saveNotes();
+    await this.saveNotes(this.notes);
     this.notesSubject.next([...this.notes]);
   }
 
@@ -51,20 +51,20 @@ export class NoteService {
     if (index !== -1) {
       updatedNote.editAt = new Date();
       this.notes[index] = updatedNote;
-      await this.saveNotes();
+      await this.saveNotes(this.notes);
       this.notesSubject.next([...this.notes]);
     }
   }
 
   async deleteNote(id: string): Promise<void> {
     this.notes = this.notes.filter(note => note.id !== id);
-    await this.saveNotes();
+    await this.saveNotes(this.notes);
     this.notesSubject.next([...this.notes]);
   }
 
-  private async saveNotes(): Promise<void> {
+  private async saveNotes(notes:Note[]): Promise<void> {
     if (this.userId) {
-      await this.offlineStorage.saveUserNotes(this.userId, this.notes);
+      await this.offlineStorage.saveUserNotes(this.userId, notes);
     } else {
       console.log('UserId nicht gefunden! Es wurde nicht gespeichert!')
     }
