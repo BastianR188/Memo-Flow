@@ -25,7 +25,8 @@ export class NoteComponent implements OnInit {
 
   isFullscreen: boolean = false;
   selectedColor: string = 'white'; // Standardfarbe, falls gewünscht
-  isDropdownOpen: boolean = false;
+  isDropdownColorOpen: boolean = false;
+  isDropdownMenuOpen: boolean = false;
   isCompletedItemsVisible: boolean = true;
   isEditing: boolean = false;
   attachments: ImageAttachment[] = [];
@@ -63,26 +64,31 @@ export class NoteComponent implements OnInit {
     });
   }
 
-  toggleDropdown() {
-    this.isDropdownOpen = !this.isDropdownOpen;
+  toggleDropdown(drop:string) {
+    if (drop == 'color') {
+      this.isDropdownColorOpen = !this.isDropdownColorOpen;
+    }
+    if (drop == 'menu') {
+      this.isDropdownMenuOpen = !this.isDropdownMenuOpen;
+    }
   }
   onClickOutside(event: MouseEvent) {
     const target = event.target as HTMLElement;
     if (!target.closest('.color-selector')) {
-      this.isDropdownOpen = false;
+      this.isDropdownColorOpen = false;
     }
   }
 
   selectColor(color: string) {
     this.note.color = color;
-    this.isDropdownOpen = false;
+    this.isDropdownColorOpen = false;
   }
   updateChecklistOrder() {
     // Sortiere die gesamte Checkliste basierend auf der `order`-Eigenschaft
     this.note.checklistItems.sort((a, b) => a.order - b.order);
   }
 
-  onCheckboxChange(event:any, itemId: string) {
+  onCheckboxChange(event: any, itemId: string) {
     event.stopPropagation();
 
     const item = this.note.checklistItems.find(i => i.id === itemId);
@@ -145,7 +151,7 @@ export class NoteComponent implements OnInit {
     }
   }
 
-  removeAttachment(event:any, attachmentId: string) {
+  removeAttachment(event: any, attachmentId: string) {
     event.stopPropagation();
     this.attachmentService.removeAttachmentFromNote(this.note, attachmentId);
     this.checkIfEmpty()

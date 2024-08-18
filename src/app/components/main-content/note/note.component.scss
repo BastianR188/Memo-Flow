@@ -49,7 +49,7 @@
     text-wrap: nowrap;
     display: flex;
     gap: 8px;
-    padding: 8px 32px;
+    padding: 8px 24px;
     align-items: center;
 }
 
@@ -182,10 +182,17 @@ ul {
         opacity: 0;
         padding: 8px;
         transition: all 0.3s ease;
+        border-radius: 0 0 24px 24px;
     }
 
     .date-footer.visible {
+        box-shadow: 0 5px 15px -10px rgba(0, 0, 0, 0.3) inset;
         opacity: 1;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-radius: 0 0 24px 24px;
     }
 
 
@@ -212,20 +219,45 @@ ul {
     }
 }
 
+.btn-menu {
+    transition: all 0.3s ease;
 
+    &:hover {
+        cursor: pointer;
+        transform: scale(1.1);
+        transition: all 0.3s ease;
+    }
+}
+
+.footer-menu-drop {
+    flex-direction: column;
+    padding: 16px;
+    width: 140px;
+    white-space: nowrap;
+    overflow-wrap: normal;
+    word-wrap: normal;
+    word-break: keep-all;
+    hyphens: none;
+}
+
+.note-fullscreen {
+    overflow: auto;
+    margin-bottom: 54px;
+    max-height: calc(95vh - 52px);
+}
 
 .note-selected-content {
-    overflow-y: auto;
-    overflow-x: hidden;
     max-height: 95vh;
 }
 
 .main-attachment {
     position: relative;
-
-    img {
-        height: auto;
+    width: 100%;
+    .attachment {
         width: 100%;
+        height: auto;
+        -o-object-fit: cover;
+        object-fit: cover;
     }
 
 
@@ -239,7 +271,7 @@ ul {
         transition: opacity 0.15s ease, transform 0.15s ease-in-out; // Kombinierte Transition
 
         &:hover {
-            transform: scale(1.2);
+            transform: scale(1.1);
         }
     }
 
@@ -251,7 +283,7 @@ ul {
 }
 
 .note-selected {
-    min-width: 280px;
+    min-width: 480px;
     width: max-content;
     max-width: 1280px;
 }
