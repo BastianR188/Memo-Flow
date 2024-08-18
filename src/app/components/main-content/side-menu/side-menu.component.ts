@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NoteService } from '../../../services/note.service';
 import { Router } from '@angular/router';
+import { LabelService } from '../../../services/label.service';
 
 @Component({
   selector: 'app-side-menu',
@@ -10,7 +11,7 @@ import { Router } from '@angular/router';
   styleUrl: './side-menu.component.scss'
 })
 export class SideMenuComponent {
-  constructor(private noteService: NoteService, private router: Router) { }
+  constructor(private noteService: NoteService, private router: Router, private label:LabelService) { }
   goToTrash() {
     this.noteService.openTrash = true;
   }
@@ -21,5 +22,8 @@ export class SideMenuComponent {
 
   goToLogin() {
     this.router.navigate(['']);
+  }
+  addLabel() {
+    this.label.newLabel();
   }
 }

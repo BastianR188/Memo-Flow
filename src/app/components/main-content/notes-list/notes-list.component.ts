@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { NoteComponent } from '../note/note.component';
 import { ColorService } from '../../../services/color.service';
 import { AutosizeModule } from 'ngx-autosize';
+import { LabelService } from '../../../services/label.service';
 
 @Component({
   selector: 'app-notes-list',
@@ -34,7 +35,8 @@ export class NotesListComponent implements OnInit {
     public noteService: NoteService,
     private attachmentService: AttachmentService,
     private checklistService: ChecklistService,
-    private colorService: ColorService // Injektion des ColorService
+    private colorService: ColorService,
+    public label:LabelService
   ) { }
 
   ngOnInit() {
@@ -45,16 +47,16 @@ export class NotesListComponent implements OnInit {
     const hasContent = this.isChecklist
       ? this.checklistItems.some(item => item.text.length > 0)
       : this.note.length > 0;
-  
+
     const hasAttachment = this.attachments && this.attachments.length > 0;
-  
+
     if (this.title.length === 0 && !hasContent && !hasAttachment) {
       return this.resetForm();
     }
     await this.noteService.addNote(this.newNote());
     this.resetForm();
   }
-  
+
 
 
   newNote() {
@@ -69,10 +71,12 @@ export class NotesListComponent implements OnInit {
       attachments: this.attachments,
       createdAt: new Date(),
       editAt: null,
-      delete: false
+      delete: false,
+      labels: []
     };
     return newNote;
   }
+
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
   }

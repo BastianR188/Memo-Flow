@@ -30,7 +30,7 @@ export class NoteService {
 
   private async loadNotes() {
     if (this.userId) {
-      this.notes = await this.offlineStorage.getUserNotes(this.userId);
+      this.notes = await this.offlineStorage.getUserNotes(this.userId) as Note[];
       this.notesSubject.next(this.notes);
     }
   }

@@ -12,6 +12,12 @@ export interface ImageAttachment {
     size: number;
 }
 
+export interface Label {
+    id: string;
+    name: string;
+    color: string;
+}
+
 export interface Note {
     id: string;
     title: string;
@@ -24,4 +30,5 @@ export interface Note {
     editAt: Date | null;  // Erlaubt null oder einen leeren String
     delete: boolean;
     attachments: ImageAttachment[];
+    labels: string[];  // Neues Array für Labels
 }
