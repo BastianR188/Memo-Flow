@@ -35,6 +35,8 @@
         gap: 16px;
         transition: all 0.3s ease;
         padding-bottom: 16px;
+        border: solid 1px rgba($color: grey, $alpha: 0.3);
+        box-shadow: 0 10px 20px rgba($color: #000000, $alpha: 0.2), 0 6px 6px rgba($color: #000000, $alpha: 0.2);
     }
 
     .image-preview {
@@ -46,9 +48,7 @@
 
     .preview-image {
         max-width: 480px;
-        /* Beispielgröße */
         max-height: 480px;
-        /* Beispielgröße */
         object-fit: cover;
         margin-right: 10px;
         margin-bottom: 10px;

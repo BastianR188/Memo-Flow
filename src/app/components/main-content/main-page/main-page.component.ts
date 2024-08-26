@@ -6,6 +6,7 @@ import { NoteService } from '../../../services/note.service';
 import { TrashComponent } from "../trash/trash.component";
 import { CommonModule } from '@angular/common';
 import { LabelService } from '../../../services/label.service';
+import { Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'app-main-page',
@@ -15,23 +16,41 @@ import { LabelService } from '../../../services/label.service';
   styleUrl: './main-page.component.scss'
 })
 export class MainPageComponent implements OnInit {
-
+  private destroy$ = new Subject<void>();
   constructor(
-    private route: ActivatedRoute, public noteService: NoteService, private labelService: LabelService) { }
+    private route: ActivatedRoute, public noteService: NoteService, private labelService: LabelService) {
+  }
   ngOnInit() {
-    this.route.params.subscribe(async params => {
-      const userId = params['id'];
-      await this.noteService.setUserId(userId);
+    this.route.params.pipe(
+      switchMap(params => {
+        const userId = params['id'];
+        return this.initializeServices(userId);
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
       this.loadNotes();
       this.loadLabels();
     });
   }
+  private initializeServices(userId: string) {
+    return Promise.all([
+      this.noteService.setUserId(userId),
+      this.labelService.setUserId(userId)
+    ]);
+  }
   loadNotes() {
-    this.noteService.getNotes().subscribe(notes => {
-      this.noteService.sortNotes(notes);
-    });
+    this.noteService.getNotes().pipe(
+      tap(notes => this.noteService.sortNotes(notes)),
+      takeUntil(this.destroy$)
+    ).subscribe();
   }
   loadLabels() {
-    this.labelService.getLabels().subscribe();
+    this.labelService.getLabels().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe();
+  }
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

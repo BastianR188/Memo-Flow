@@ -1,0 +1,19 @@
+<h2 mat-dialog-title>Neues Label hinzufügen</h2>
+<form #labelForm="ngForm" (ngSubmit)="onSubmit()">
+    <mat-dialog-content>
+        <mat-form-field>
+            <mat-label>Labelname</mat-label>
+            <input matInput [(ngModel)]="labelName" name="labelName" 
+                   (ngModelChange)="clearError()"
+                   #labelNameInput="ngModel" 
+                   required>
+            <mat-error *ngIf="errorMessage">
+                {{ errorMessage }}
+            </mat-error>
+        </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button type="button" (click)="onNoClick()">Abbrechen</button>
+        <button mat-button type="submit">Bestätigen</button>
+    </mat-dialog-actions>
+</form>

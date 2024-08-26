@@ -36,7 +36,7 @@ export class NotesListComponent implements OnInit {
     private attachmentService: AttachmentService,
     private checklistService: ChecklistService,
     private colorService: ColorService,
-    public label:LabelService
+    public label: LabelService
   ) { }
 
   ngOnInit() {
@@ -47,17 +47,13 @@ export class NotesListComponent implements OnInit {
     const hasContent = this.isChecklist
       ? this.checklistItems.some(item => item.text.length > 0)
       : this.note.length > 0;
-
     const hasAttachment = this.attachments && this.attachments.length > 0;
-
     if (this.title.length === 0 && !hasContent && !hasAttachment) {
       return this.resetForm();
     }
     await this.noteService.addNote(this.newNote());
     this.resetForm();
   }
-
-
 
   newNote() {
     const newNote: Note = {
@@ -80,6 +76,7 @@ export class NotesListComponent implements OnInit {
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
+
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
     const target = event.target as HTMLElement;
@@ -87,10 +84,12 @@ export class NotesListComponent implements OnInit {
       this.isDropdownOpen = false;
     }
   }
+
   selectColor(color: string) {
     this.selectedColor = color;
     this.isDropdownOpen = false;
   }
+
   resetForm() {
     this.title = '';
     this.note = '';
@@ -104,14 +103,17 @@ export class NotesListComponent implements OnInit {
       this.fileInput.nativeElement.value = '';
     }
   }
+
   isChecklistItem() {
     if (this.checklistItems.length === 0) {
       this.addChecklistItem();
     }
   }
+
   deleteChecklistItems() {
     this.checklistItems = [];
   }
+
   addChecklistItem() {
     const newItem: ChecklistItem = {
       id: this.checklistService.generateUniqueId(),
@@ -124,6 +126,7 @@ export class NotesListComponent implements OnInit {
       this.focusNewItem(newItem.id);
     });
   }
+
   focusNewItem(id: string): void {
     setTimeout(() => {
       const newItem = document.getElementById(`item-${id}`);
@@ -132,6 +135,7 @@ export class NotesListComponent implements OnInit {
       }
     });
   }
+
   removeChecklistItem(itemId: string) {
     const index = this.checklistItems.findIndex(item => item.id === itemId);
     if (index !== -1) {

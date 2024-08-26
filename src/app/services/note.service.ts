@@ -9,6 +9,7 @@ import { OfflineStorageService } from './offline-storage.service';
 export class NoteService {
   private notes: Note[] = [];
   private notesSubject = new BehaviorSubject<Note[]>([]);
+  
   userId: string | null = null;
   openTrash: boolean = false;
   pinnedNotes: Note[] = [];

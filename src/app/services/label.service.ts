@@ -9,7 +9,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class LabelService {
   labels: Label[] = [];
   private labelsSubject = new BehaviorSubject<Label[]>([]);
-  userId:string = '';
+  userId: string = '';
   // Verwaltung von Labels
   // Synchronisation mit Firebase
 
@@ -50,11 +50,30 @@ export class LabelService {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 
-  newLabel() {
-    console.log('Add new Label in Service')
+  newLabel(labelName: string) {
+    const newLabel: Label = {
+      id: this.newId(),
+      name: labelName,
+      color: '#ffffff',
+    }
+    return newLabel
   }
 
-  addLabel() {
-    console.log('Label auswahl öffnen')
+  async addLabel(labelName: string) {
+    if (!this.userId) throw new Error('User not set');
+    this.labels.push(this.newLabel(labelName));
+    await this.saveLabels();
+    this.labelsSubject.next([...this.labels])
+  }
+
+  async deletLabel(index:number) {
+    this.labels.splice(index, 1);
+    await this.saveLabels();
+    this.labelsSubject.next([...this.labels])
+  }
+
+  async setLabel() {
+    await this.saveLabels();
+    this.labelsSubject.next([...this.labels])
   }
 }

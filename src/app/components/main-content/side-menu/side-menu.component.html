@@ -1,6 +1,36 @@
 <div class="main">
     <button (click)="goToNote();goToLogin()">Ausloggen</button>
     <button (click)="goToNote()">Notizen</button>
-    <button (click)="addLabel()">Labels</button>
+
+    <div class="color-selector" (click)="openDropdown('addLabel')"
+        (clickOutside)="onClickOutside('addLabel'); isEditLabel = -1; inputLabel = ''">
+        <button>Label bearbeiten</button>
+        <div class="dropdown-menu" *ngIf="addLabelDropdown">
+            <div>
+                <div>Neues Label erstellen</div>
+                <div class="dropdown-container close-hover">
+                    <img (click)="abortNewLabel()" class="icon close" src=".\assets\icons\close.svg" alt="">
+                    <input class="label-name" type="text" [(ngModel)]="inputLabel">
+                    <img *ngIf="inputLabel.length != 0" (click)="addNewLabel()" class="icon" src=".\assets\icons\check.svg" alt="">
+                </div>
+            </div>
+            <div class="stroke"></div>
+            <div *ngFor="let label of this.label.labels; let i = index" class="dropdown-container close-hover">
+                <img (click)="removeLabel(label)" class="icon close" src=".\assets\icons\close.svg" alt="">
+                <div *ngIf="isEditLabel == i" class="label-item">
+                    <input class="label-name" [(ngModel)]="editInputName" type="text" name="" id="">
+                    <img (click)="setLabel(i)" class="icon" src=".\assets\icons\check.svg" alt="">
+                </div>
+                <div *ngIf="isEditLabel != i" class="label-item">
+                    <div class="label-name">{{label.name}}</div>
+                    <img (click)="editLabel(label, i)" class="icon" src=".\assets\icons\edit.svg" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngFor="let label of this.label.labels" class="label-item label">
+        <img class="icon label-icon" src=".\assets\icons\label.svg" alt="">
+        <div class="text-ellipsis label-icon">{{label.name}}</div>
+    </div>
     <button (click)="goToTrash()">Papierkorb</button>
 </div>
