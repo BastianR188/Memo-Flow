@@ -1,5 +1,3 @@
-
-
 .title-box {
     margin: 8px 16px 0 16px;
 }
@@ -69,11 +67,55 @@
     align-items: center;
 }
 
+.label-border {
+    width: 38px;
+    border-radius: 16px;
+    border: solid 1px rgba($color: grey, $alpha: 0.3);
+}
+
+.label-item {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 8px;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+
+    &:hover {
+        transform: scale(1.1);
+    }
+}
+.stroke {
+    border-bottom: solid 1px rgba($color: grey, $alpha: 0.3);
+    margin: 4px 0;
+}
+.label-btn-menu {
+    display: flex;
+    align-items: center;
+}
+.footer-menu-drop {
+    flex-direction: column;
+    padding: 16px;
+    width: 140px;
+    white-space: nowrap;
+    overflow-wrap: normal;
+    word-wrap: normal;
+    word-break: keep-all;
+    hyphens: none;
+}
+.label-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 16px;
+}
+
 .outerbox {
     position: relative;
     margin: 8px 32px;
-    border: 1px solid transparent; 
-    transition: border 0.3s ease; 
+    border: 1px solid transparent;
+    transition: border 0.3s ease;
+
     &:focus-within {
         border-top: 1px solid #ccc;
         border-bottom: 1px solid #ccc;
@@ -108,7 +150,13 @@
 
     }
 }
-
+.dropdown-menu {
+    bottom: auto;
+    top: 0;
+}
+.footer-menu-drop{
+    position: relative;
+}
 .footer-menu-container {
     display: flex;
     gap: 32px;
@@ -119,4 +167,7 @@
     flex-direction: column;
     width: 100%;
     align-content: space-between;
+}
+.label-width{
+    width: auto;
 }

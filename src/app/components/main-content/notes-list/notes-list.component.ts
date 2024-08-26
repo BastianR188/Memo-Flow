@@ -2,18 +2,19 @@ import { Component, OnInit, ViewChild, ElementRef, HostListener, QueryList, View
 import { NoteService } from '../../../services/note.service';
 import { AttachmentService } from '../../../services/attachment.service';
 import { ChecklistService } from '../../../services/checklist.service';
-import { Note, ChecklistItem, ImageAttachment } from '../../../model/note';
+import { Note, ChecklistItem, ImageAttachment, Label } from '../../../model/note';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NoteComponent } from '../note/note.component';
 import { ColorService } from '../../../services/color.service';
 import { AutosizeModule } from 'ngx-autosize';
 import { LabelService } from '../../../services/label.service';
+import { ClickOutsideDirective } from '../../../services/click-outside.directive';
 
 @Component({
   selector: 'app-notes-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, NoteComponent, AutosizeModule],
+  imports: [CommonModule, FormsModule, NoteComponent, AutosizeModule,ClickOutsideDirective],
   templateUrl: './notes-list.component.html',
   styleUrls: ['./notes-list.component.scss']
 })
@@ -21,7 +22,9 @@ export class NotesListComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @ViewChildren('textArea') textAreas!: QueryList<ElementRef>;
   selectedColor: string = '#ffffff'; // Standardfarbe, falls gewünscht
-  isDropdownOpen: boolean = false;
+  isDropdownColorOpen: boolean = false;
+  isDropdownLabelOpen: boolean = false;
+  labels: Label[] = [];
   imageUrls: string[] = [];
   userId: string = '';
   title: string = '';
@@ -36,7 +39,7 @@ export class NotesListComponent implements OnInit {
     private attachmentService: AttachmentService,
     private checklistService: ChecklistService,
     private colorService: ColorService,
-    public label: LabelService
+    public labelService: LabelService
   ) { }
 
   ngOnInit() {
@@ -68,26 +71,32 @@ export class NotesListComponent implements OnInit {
       createdAt: new Date(),
       editAt: null,
       delete: false,
-      labels: []
+      labels: this.labels
     };
     return newNote;
   }
 
-  toggleDropdown() {
-    this.isDropdownOpen = !this.isDropdownOpen;
+  openDropdown(dropdownId: string) {
+    if (dropdownId === 'color') {
+      this.isDropdownColorOpen = true;
+    } else if (dropdownId === 'label') {
+      this.isDropdownLabelOpen = true;
+    } 
   }
 
-  @HostListener('document:click', ['$event'])
-  onClickOutside(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.color-selector')) {
-      this.isDropdownOpen = false;
-    }
-  }
+  onClickOutside(dropdownId: string) {
+    setTimeout(() => {
+      if (dropdownId === 'color') {
+        this.isDropdownColorOpen = false;
+      } else if (dropdownId === 'label') {
+        this.isDropdownLabelOpen = false;
+      }
+    })
 
+  }
   selectColor(color: string) {
     this.selectedColor = color;
-    this.isDropdownOpen = false;
+    this.isDropdownColorOpen = false;
   }
 
   resetForm() {
@@ -99,11 +108,14 @@ export class NotesListComponent implements OnInit {
     this.attachments = [];
     this.checklistItems = [];
     this.imageUrls = [];
+    this.labels = [];
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }
   }
-
+  selectLabel(id: string) {
+    this.noteService.setSelectedLabel(id);
+  }
   isChecklistItem() {
     if (this.checklistItems.length === 0) {
       this.addChecklistItem();
@@ -165,6 +177,33 @@ export class NotesListComponent implements OnInit {
     }
   }
 
+  ifNoteInLabels(id: string): boolean {
+    return this.labels.some(label => label.id === id);
+  }
+
+  toggleLabel(id: string) {
+    if (this.ifNoteInLabels(id)) {
+      const index = this.labels.findIndex(label => label.id === id);
+      if (index !== -1) {
+        this.labels.splice(index, 1);
+        console.log(`Label mit ID ${id} wurde aus der Note entfernt.`);
+      }
+    } else {
+      const labelToAdd = this.labelService.labels.find(label => label.id === id);
+    if (labelToAdd) {
+      const labelExists = this.labels.some(label => label.id === id);
+      if (!labelExists) {
+        this.labels.push(labelToAdd);
+        console.log(`Label "${labelToAdd.name}" wurde zur Note " ${this.note}" hinzugefügt.`);
+      } else {
+        console.log(`Label "${labelToAdd.name}" existiert bereits in dieser Note.`);
+      }
+    } else {
+      console.log(`Label mit ID ${id} wurde nicht gefunden.`);
+    }
+    }
+    
+  }
 
   onPinStatusChanged() {
   }

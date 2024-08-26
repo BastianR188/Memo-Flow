@@ -171,6 +171,7 @@ ul.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
 
 .stroke {
     border-bottom: solid 1px rgba($color: grey, $alpha: 0.3);
+    margin: 4px 0;
 }
 
 ul {
@@ -351,4 +352,7 @@ ul {
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease;
+}
+.label-width{
+    width: auto;
 }

@@ -79,7 +79,7 @@
 
                     </div>
                     <div class="label-box">
-                        <div *ngFor="let label of note.labels" class="label-item label-border" style="margin-bottom: 20px;"
+                        <div *ngFor="let label of note.labels" class="label-item label-border label-width" style="margin-bottom: 20px;"
                             (click)="selectLabel(label.id)">
                             {{ label.name }}
                         </div>
@@ -115,27 +115,28 @@
                             </div>
                         </div>
                     </ng-container>
-                    <div class="label-box">
-                        <ng-container *ngIf="note.labels.length <= 4; else moreThanFour">
-                            <div *ngFor="let label of note.labels" class="label-item label-border"
-                                (click)="selectLabel(label.id)">
-                                {{ label.name }}
-                            </div>
-                        </ng-container>
-                        <ng-template #moreThanFour>
-                            <div *ngFor="let label of note.labels.slice(0, 3)" class="label-item label-border"
-                                (click)="selectLabel(label.id)">
-                                {{ label.name }}
-                            </div>
-                            <div class="label-item label-border">
-                                +{{ note.labels.length - 3 }}
-                            </div>
-                        </ng-template>
-
-                    </div>
+              
                 </div>
 
             </div>
+        </div>
+        <div class="label-box"  *ngIf="!isEditing">
+            <ng-container *ngIf="note.labels.length <= 4; else moreThanFour">
+                <div *ngFor="let label of note.labels" class="label-item label-border"
+                    (click)="selectLabel(label.id)">
+                    {{ label.name }}
+                </div>
+            </ng-container>
+            <ng-template #moreThanFour>
+                <div *ngFor="let label of note.labels.slice(0, 3)" class="label-item label-border"
+                    (click)="selectLabel(label.id)">
+                    {{ label.name }}
+                </div>
+                <div class="label-item label-border">
+                    +{{ note.labels.length - 3 }}
+                </div>
+            </ng-template>
+
         </div>
 
 

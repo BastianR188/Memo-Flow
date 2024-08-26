@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { ChecklistItem, ImageAttachment, Note } from '../../../model/note';
+import { ChecklistItem, ImageAttachment, Label, Note } from '../../../model/note';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, CdkDropList, CdkDrag, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
@@ -56,9 +56,18 @@ export class NoteComponent implements OnInit, OnDestroy {
     }
   }
   validateAndCleanLabels() {
-    const validLabelIds = new Set(this.labelService.labels.map(label => label.id));
-    this.note.labels = this.note.labels.filter(label => validLabelIds.has(label.id));
+    const validLabels = new Map(this.labelService.labels.map(label => [label.id, label]));
+    
+    this.note.labels = this.note.labels.map(noteLabel => {
+      const validLabel = validLabels.get(noteLabel.id);
+      if (validLabel) {
+        // Aktualisiere den Namen, falls er sich geändert hat
+        return { ...noteLabel, name: validLabel.name };
+      }
+      return null;
+    }).filter((label): label is Label => label !== null);
   }
+  
 
   get uncheckedItems(): ChecklistItem[] {
     return this.note.checklistItems.filter(item => !item.checked);

@@ -31,7 +31,7 @@ export class NoteService {
 
     this.pinnedNotes = filteredNotes.filter(note => note.isPinned && !note.delete);
     this.unpinnedNotes = filteredNotes.filter(note => !note.isPinned && !note.delete);
-    this.deletedNotes = filteredNotes.filter(note => note.delete);
+    this.deletedNotes = notes.filter(note => note.delete);
   }
 
   setSelectedLabel(labelId: string) {

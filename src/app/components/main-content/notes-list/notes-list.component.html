@@ -15,10 +15,6 @@
                 <div *ngIf="!isChecklist" class="input-line title-box">
                     <textarea [style.backgroundColor]="selectedColor" class="input-content" autosize type="text"
                         [(ngModel)]="note" placeholder="Note" rows="1"></textarea>
-                    <!-- <label class="input-checkbox">
-                        <input type="checkbox" [(ngModel)]="isChecklist"
-                            (change)="checklistItems.length === 0 && addChecklistItem()"> Checkliste
-                    </label> -->
 
                 </div>
                 <div *ngIf="isChecklist">
@@ -47,15 +43,22 @@
         <div *ngIf="imageUrls.length != 0" class="image-preview">
             <img *ngFor="let imageUrl of imageUrls" [src]="imageUrl" alt="Selected Image" class="preview-image">
         </div>
+        <div class="label-box">
+            <div *ngFor="let label of labels" class="label-item label-border label-width" style="margin-bottom: 20px;"
+                (click)="selectLabel(label.id)">
+                {{ label.name }}
+            </div>
+        </div>
         <div class="input-footer-container">
             <div class="footer-menu-container">
                 <div class="icon"></div>
 
-                <div class="color-selector" (click)="toggleDropdown()">
+                <div class="color-selector" (click)="openDropdown('color')">
                     <img class="icon" src="assets/icons/color-white.svg" alt="">
-                    <div class="dropdown-menu" *ngIf="isDropdownOpen">
+                    <div class="dropdown-menu" *ngIf="isDropdownColorOpen" (clickOutside)="onClickOutside('color')">
                         <div *ngFor="let color of colors" class="dropdown-item icon"
-                            [style.backgroundColor]="color.value" (click)="selectColor(color.value);toggleDropdown()">
+                            [style.backgroundColor]="color.value"
+                            (click)="selectColor(color.value);onClickOutside('color')">
                         </div>
                     </div>
                 </div>
@@ -66,8 +69,23 @@
                         style="display: none;">
                 </div>
 
-                <div>
-                    <img class="icon" src=".\assets\icons\label.svg" alt="" >
+                <div style="position: relative;">
+                    <img class="icon" (click)="onClickOutside('menu'); openDropdown('label')"
+                        src=".\assets\icons\label.svg" alt="">
+                    <div class="dropdown-menu" *ngIf="isDropdownLabelOpen" (clickOutside)="onClickOutside('label')">
+                        <div class="footer-menu-drop">
+                            <div *ngFor="let label of labelService.labels" class="label-item label-btn-menu"
+                                (click)="toggleLabel(label.id)">
+                                <img *ngIf="ifNoteInLabels(label.id)" class="icon"
+                                    src=".\assets\icons\checkbox-check.svg" alt="">
+                                <img *ngIf="!ifNoteInLabels(label.id)" class="icon"
+                                    src=".\assets\icons\checkbox-unchecked.svg" alt="">
+                                <div>{{label.name}}</div>
+                            </div>
+                            <div class="stroke"></div>
+                            <div (click)="onClickOutside('label')" class="label-item">Schließen</div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
