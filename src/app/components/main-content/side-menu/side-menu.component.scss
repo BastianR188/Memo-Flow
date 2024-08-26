@@ -60,6 +60,15 @@ button {
     display: flex;
     width: 100%;
     align-items: center;
+    border-radius: 16px;
+    padding: 0 8px;
+    &.selected-label {
+        background-color: #e0e0e0;
+    }
+}
+
+.label-dropmenu {
+    min-width: 200px;
 }
 
 .text-ellipsis {
@@ -73,6 +82,7 @@ button {
 
 .label {
     transition: all 0.3s ease-in-out;
+
     &:hover .label-icon {
         transform: scale(1.1);
     }

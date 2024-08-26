@@ -5,7 +5,7 @@
     <div class="color-selector" (click)="openDropdown('addLabel')"
         (clickOutside)="onClickOutside('addLabel'); isEditLabel = -1; inputLabel = ''">
         <button>Label bearbeiten</button>
-        <div class="dropdown-menu" *ngIf="addLabelDropdown">
+        <div class="dropdown-menu label-dropmenu" *ngIf="addLabelDropdown">
             <div>
                 <div>Neues Label erstellen</div>
                 <div class="dropdown-container close-hover">
@@ -28,7 +28,7 @@
             </div>
         </div>
     </div>
-    <div *ngFor="let label of this.label.labels" class="label-item label">
+    <div *ngFor="let label of this.label.labels" class="label-item label" (click)="selectLabel(label.id)" [ngClass]="{'selected-label': label.id === noteService.selectedLabel}">
         <img class="icon label-icon" src=".\assets\icons\label.svg" alt="">
         <div class="text-ellipsis label-icon">{{label.name}}</div>
     </div>

@@ -15,6 +15,7 @@ export class NoteService {
   pinnedNotes: Note[] = [];
   unpinnedNotes: Note[] = [];
   deletedNotes: Note[] = [];
+  selectedLabel: string = '';
 
   constructor(private offlineStorage: OfflineStorageService) { }
 
@@ -24,9 +25,25 @@ export class NoteService {
   }
 
   sortNotes(notes: Note[]) {
-    this.pinnedNotes = notes.filter(note => note.isPinned && !note.delete);
-    this.unpinnedNotes = notes.filter(note => !note.isPinned && !note.delete);
-    this.deletedNotes = notes.filter(note => note.delete);
+    const filteredNotes = this.selectedLabel 
+      ? notes.filter(note => note.labels.some(label => label.id === this.selectedLabel))
+      : notes;
+
+    this.pinnedNotes = filteredNotes.filter(note => note.isPinned && !note.delete);
+    this.unpinnedNotes = filteredNotes.filter(note => !note.isPinned && !note.delete);
+    this.deletedNotes = filteredNotes.filter(note => note.delete);
+  }
+
+  setSelectedLabel(labelId: string) {
+    this.selectedLabel = labelId;
+    this.sortNotes(this.notes);
+    this.notesSubject.next([...this.pinnedNotes, ...this.unpinnedNotes, ...this.deletedNotes]);
+  }
+
+  clearSelectedLabel() {
+    this.selectedLabel = '';
+    this.sortNotes(this.notes);
+    this.notesSubject.next([...this.pinnedNotes, ...this.unpinnedNotes, ...this.deletedNotes]);
   }
 
   private async loadNotes() {

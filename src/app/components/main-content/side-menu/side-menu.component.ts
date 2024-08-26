@@ -20,13 +20,14 @@ export class SideMenuComponent {
   inputLabel: string = '';
   isEditLabel: number = -1;
   editInputName: string = '';
-  constructor(private noteService: NoteService, private router: Router, public label: LabelService) { }
+  constructor(public noteService: NoteService, private router: Router, public label: LabelService) { }
   goToTrash() {
     this.noteService.openTrash = true;
   }
 
   goToNote() {
     this.noteService.openTrash = false;
+    this.noteService.clearSelectedLabel();
   }
 
   goToLogin() {
@@ -70,6 +71,10 @@ export class SideMenuComponent {
 
   abortNewLabel() {
     this.inputLabel = '';
+  }
+
+  selectLabel(id: string) {
+    this.noteService.setSelectedLabel(id);
   }
 
   removeLabel(label: Label) {

@@ -9,6 +9,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class LabelService {
   labels: Label[] = [];
   private labelsSubject = new BehaviorSubject<Label[]>([]);
+  public labels$ = this.labelsSubject.asObservable();
   userId: string = '';
   // Verwaltung von Labels
   // Synchronisation mit Firebase

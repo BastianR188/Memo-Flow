@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { ChecklistItem, ImageAttachment, Note } from '../../../model/note';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, CdkDropList, CdkDrag, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -11,6 +11,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { ClickOutsideDirective } from '../../../services/click-outside.directive';
 import { ChecklistService } from '../../../services/checklist.service';
 import { AutosizeModule } from 'ngx-autosize';
+import { LabelService } from '../../../services/label.service';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-note',
   standalone: true,
@@ -18,15 +20,16 @@ import { AutosizeModule } from 'ngx-autosize';
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.scss']
 })
-export class NoteComponent implements OnInit {
+export class NoteComponent implements OnInit, OnDestroy {
   @Input() note!: Note;
   @Output() pinStatusChanged = new EventEmitter<void>();
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-
+  private labelSubscription!: Subscription;
   isFullscreen: boolean = false;
   selectedColor: string = 'white'; // Standardfarbe, falls gewünscht
   isDropdownColorOpen: boolean = false;
   isDropdownMenuOpen: boolean = false;
+  isDropdownLabelOpen: boolean = false;
   isCompletedItemsVisible: boolean = true;
   isEditing: boolean = false;
   attachments: ImageAttachment[] = [];
@@ -36,12 +39,25 @@ export class NoteComponent implements OnInit {
     public noteService: NoteService,
     private attachmentService: AttachmentService,
     private colorService: ColorService,
-    private checklistService: ChecklistService
+    private checklistService: ChecklistService,
+    public labelService: LabelService
   ) { }
 
   ngOnInit() {
     this.colors = this.colorService.getColors(); // Lade die Farben
-    this.sortOrder()
+    this.sortOrder();
+    this.labelSubscription = this.labelService.labels$.subscribe(() => {
+      this.validateAndCleanLabels();
+    });
+  }
+  ngOnDestroy() {
+    if (this.labelSubscription) {
+      this.labelSubscription.unsubscribe();
+    }
+  }
+  validateAndCleanLabels() {
+    const validLabelIds = new Set(this.labelService.labels.map(label => label.id));
+    this.note.labels = this.note.labels.filter(label => validLabelIds.has(label.id));
   }
 
   get uncheckedItems(): ChecklistItem[] {
@@ -63,21 +79,36 @@ export class NoteComponent implements OnInit {
       item.order = index;
     });
   }
+  selectLabel(id: string) {
+    this.noteService.setSelectedLabel(id);
+  }
+  openDropdown(dropdownId: string) {
+    if (dropdownId === 'color') {
+      this.isDropdownColorOpen = true;
+    } else if (dropdownId === 'label') {
+      this.isDropdownLabelOpen = true;
+    } else if (dropdownId === 'menu' && this.isDropdownLabelOpen == false) {
+      this.isDropdownMenuOpen = true;
+    }
+  }
 
-  toggleDropdown(drop:string) {
-    if (drop == 'color') {
-      this.isDropdownColorOpen = !this.isDropdownColorOpen;
-    }
-    if (drop == 'menu') {
-      this.isDropdownMenuOpen = !this.isDropdownMenuOpen;
-    }
+  onClickOutside(dropdownId: string) {
+    setTimeout(() => {
+      if (dropdownId === 'color') {
+        this.isDropdownColorOpen = false;
+      } else if (dropdownId === 'menu') {
+        this.isDropdownMenuOpen = false;
+      } else if (dropdownId === 'label') {
+        this.isDropdownLabelOpen = false;
+      }
+    })
+
   }
-  onClickOutside(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.color-selector')) {
-      this.isDropdownColorOpen = false;
-    }
+
+  ifNoteInLabels(id: string): boolean {
+    return this.note.labels.some(label => label.id === id);
   }
+  
 
   selectColor(color: string) {
     this.note.color = color;
@@ -196,4 +227,29 @@ export class NoteComponent implements OnInit {
       this.note.checklistItems.splice(index, 1);
     }
   }
+
+  toggleLabel(id: string) {
+    if (this.ifNoteInLabels(id)) {
+      const index = this.note.labels.findIndex(label => label.id === id);
+      if (index !== -1) {
+        this.note.labels.splice(index, 1);
+        console.log(`Label mit ID ${id} wurde aus der Note entfernt.`);
+      }
+    } else {
+      const labelToAdd = this.labelService.labels.find(label => label.id === id);
+    if (labelToAdd) {
+      const labelExists = this.note.labels.some(label => label.id === id);
+      if (!labelExists) {
+        this.note.labels.push(labelToAdd);
+        console.log(`Label "${labelToAdd.name}" wurde zur Note " ${this.note}" hinzugefügt.`);
+      } else {
+        console.log(`Label "${labelToAdd.name}" existiert bereits in dieser Note.`);
+      }
+    } else {
+      console.log(`Label mit ID ${id} wurde nicht gefunden.`);
+    }
+    }
+    
+  }
+
 }

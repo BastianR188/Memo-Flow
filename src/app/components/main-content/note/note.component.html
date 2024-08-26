@@ -15,12 +15,11 @@
     </div>
 
     <div [ngClass]="{'note-selected-content': isFullscreen}">
-        <div  [ngClass]="{'note-fullscreen': isFullscreen}">
+        <div [ngClass]="{'note-fullscreen': isFullscreen}">
             <div>
                 <div *ngIf="note.attachments.length > 0" (click)="editNote()">
                     <div *ngFor="let attachment of note.attachments; let i = index" class="main-attachment">
-                        <img class="attachment" [src]="attachment.url" alt="Attachment"
-                            >
+                        <img class="attachment" [src]="attachment.url" alt="Attachment">
                         <img class="icon close" (click)="removeAttachment($event, attachment.id); saveNote()"
                             src=".\assets\icons\close.svg" alt="">
                     </div>
@@ -79,7 +78,12 @@
 
 
                     </div>
-
+                    <div class="label-box">
+                        <div *ngFor="let label of note.labels" class="label-item label-border" style="margin-bottom: 20px;"
+                            (click)="selectLabel(label.id)">
+                            {{ label.name }}
+                        </div>
+                    </div>
                 </div>
             </div>
             <div (click)="editNote()">
@@ -111,8 +115,26 @@
                             </div>
                         </div>
                     </ng-container>
+                    <div class="label-box">
+                        <ng-container *ngIf="note.labels.length <= 4; else moreThanFour">
+                            <div *ngFor="let label of note.labels" class="label-item label-border"
+                                (click)="selectLabel(label.id)">
+                                {{ label.name }}
+                            </div>
+                        </ng-container>
+                        <ng-template #moreThanFour>
+                            <div *ngFor="let label of note.labels.slice(0, 3)" class="label-item label-border"
+                                (click)="selectLabel(label.id)">
+                                {{ label.name }}
+                            </div>
+                            <div class="label-item label-border">
+                                +{{ note.labels.length - 3 }}
+                            </div>
+                        </ng-template>
 
+                    </div>
                 </div>
+
             </div>
         </div>
 
@@ -123,28 +145,48 @@
             <div class="footer">
                 <div *ngIf="!note.delete" class="footer-note">
                     <div>
-                        <div class="color-selector" (click)="toggleDropdown('color')"
+                        <div class="color-selector" (click)="openDropdown('color')"
                             (clickOutside)="this.isDropdownColorOpen = false;">
                             <img class="icon" src="assets/icons/color-white.svg" alt="">
                             <div class="dropdown-menu" *ngIf="isDropdownColorOpen">
                                 <div *ngFor="let color of colors" class="dropdown-item icon"
                                     [style.backgroundColor]="color.value"
-                                    (click)="selectColor(color.value);toggleDropdown('color');saveNote()">
+                                    (click)="selectColor(color.value);onClickOutside('color');saveNote()">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div>
                         <img class="icon" src="assets/icons/img-white.svg" alt="" (click)="fileInput.click()">
-                        <input type="file" #fileInput (change)="onFileSelected($event)" multiple
-                            accept="image/*" style="display: none;">
+                        <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*"
+                            style="display: none;">
                     </div>
-                    <div class="color-selector" (click)="toggleDropdown('menu')"
-                        (clickOutside)="this.isDropdownMenuOpen = false;">
+                    <div class="color-selector" (click)="openDropdown('menu')"
+                        (clickOutside)="onClickOutside('menu'); onClickOutside('label')">
                         <img class="icon" src=".\assets\icons\menu-vertical.svg" alt="">
                         <div class="dropdown-menu footer-menu-drop" *ngIf="isDropdownMenuOpen">
-                            <div *ngIf="!isFullscreen" class="btn-menu" (click)="editNote()">Bearbeiten</div>
-                            <div class="btn-menu" (click)="deleteNote()">Notiz Löschen</div>
+                            <div class="btn-menu" (click)="onClickOutside('menu'); openDropdown('label')">Label
+                                hinzufügen</div>
+                            <div *ngIf="!isFullscreen" class="btn-menu" (click)="onClickOutside('menu'); editNote()">
+                                Bearbeiten</div>
+                            <div class="btn-menu" (click)="deleteNote(); onClickOutside('menu')">Notiz Löschen</div>
+                            <div class="stroke"></div>
+                            <div (click)="onClickOutside('menu')" class="btn-menu">Schließen</div>
+                        </div>
+                        <div class="dropdown-menu" *ngIf="isDropdownLabelOpen" (clickOutside)="onClickOutside('label')">
+                            <div class="footer-menu-drop">
+
+                                <div *ngFor="let label of labelService.labels" class="label-item label-btn-menu"
+                                    (click)="toggleLabel(label.id)">
+                                    <img *ngIf="ifNoteInLabels(label.id)" class="icon"
+                                        src=".\assets\icons\checkbox-check.svg" alt="">
+                                    <img *ngIf="!ifNoteInLabels(label.id)" class="icon"
+                                        src=".\assets\icons\checkbox-unchecked.svg" alt="">
+                                    <div>{{label.name}}</div>
+                                </div>
+                                <div class="stroke"></div>
+                                <div (click)="onClickOutside('label')" class="label-item">Schließen</div>
+                            </div>
                         </div>
                     </div>
                 </div>

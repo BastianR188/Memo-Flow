@@ -30,5 +30,5 @@ export interface Note {
     editAt: Date | null;  // Erlaubt null oder einen leeren String
     delete: boolean;
     attachments: ImageAttachment[];
-    labels: string[];  // Neues Array für Labels
+    labels: Label[];  // Neues Array für Labels
 }
