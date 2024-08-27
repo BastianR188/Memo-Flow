@@ -93,7 +93,7 @@
                         <p *ngIf="!note.isChecklist" class="text">{{ note.content }}</p>
                     </div>
                     <ng-container *ngIf="note.isChecklist">
-                        <div cdkDropList (cdkDropListDropped)="onDrop($event, false);saveNote()">
+                        <div cdkDropList (cdkDropListDropped)="onDrop($event, false);saveNote()" [ngStyle]="{'margin-top': note.title.length === 0 ? '16px' : '0'}">
                             <div *ngFor="let item of uncheckedItems; let i = index" cdkDrag
                                 class="text-ceckbox-container">
                                 <img class="drag-handle drag-icon" src=".\assets\icons\drag-handle.svg" alt="">

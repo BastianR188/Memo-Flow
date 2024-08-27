@@ -118,7 +118,7 @@ export class NoteService {
 
   async updateAllNotes(userId:string, newNotes: Note[]) {
     const currentNotes = this.notesSubject.getValue();
-    const updatedNotes = this.dataSync.mergeAndUpdateItems(currentNotes, newNotes);
+    const updatedNotes = this.dataSync.mergeAndUpdateItems<Note>(currentNotes, newNotes);
     this.notesSubject.next(updatedNotes);
     await this.offlineStorage.saveUserNotes(userId, updatedNotes);
   }
