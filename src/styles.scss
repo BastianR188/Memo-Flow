@@ -120,11 +120,10 @@ img {
         display: flex;
         width: 100%;
         flex-wrap: wrap;
+        justify-content: center;
         gap: 16px;
     }
 }
-
-
 
 .input-content {
     border: none;

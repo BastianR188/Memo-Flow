@@ -71,7 +71,8 @@ export class NotesListComponent implements OnInit {
       createdAt: new Date(),
       editAt: null,
       delete: false,
-      labels: this.labels
+      labels: this.labels,
+      order: this.noteService.notes.length
     };
     return newNote;
   }
@@ -186,7 +187,6 @@ export class NotesListComponent implements OnInit {
       const index = this.labels.findIndex(label => label.id === id);
       if (index !== -1) {
         this.labels.splice(index, 1);
-        console.log(`Label mit ID ${id} wurde aus der Note entfernt.`);
       }
     } else {
       const labelToAdd = this.labelService.labels.find(label => label.id === id);
@@ -194,7 +194,6 @@ export class NotesListComponent implements OnInit {
       const labelExists = this.labels.some(label => label.id === id);
       if (!labelExists) {
         this.labels.push(labelToAdd);
-        console.log(`Label "${labelToAdd.name}" wurde zur Note " ${this.note}" hinzugefügt.`);
       } else {
         console.log(`Label "${labelToAdd.name}" existiert bereits in dieser Note.`);
       }

@@ -18,6 +18,19 @@ export interface Label {
     color: string;
 }
 
+export interface userData {
+    noteIds: string[];
+        labelIds: string[];
+        // andere Felder...
+}
+
+export interface FirebaseAttachment {
+    id: string;
+    name: string;
+    url: string;
+    size: number;
+  }
+
 export interface Note {
     id: string;
     title: string;
@@ -31,4 +44,5 @@ export interface Note {
     delete: boolean;
     attachments: ImageAttachment[];
     labels: Label[];  // Neues Array für Labels
+    order: number;
 }

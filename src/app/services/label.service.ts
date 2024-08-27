@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Label } from '../model/note';
 import { OfflineStorageService } from './offline-storage.service';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { DataSyncService } from './data-sync.service';
+import { NoteService } from './note.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,12 +11,11 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class LabelService {
   labels: Label[] = [];
   private labelsSubject = new BehaviorSubject<Label[]>([]);
-  public labels$ = this.labelsSubject.asObservable();
   userId: string = '';
   // Verwaltung von Labels
   // Synchronisation mit Firebase
 
-  constructor(private offlineStorage: OfflineStorageService) { }
+  constructor(private offlineStorage: OfflineStorageService, private dataSync: DataSyncService) { }
   async setUserId(userId: string) {
     this.userId = userId;
     await this.loadLabels();
@@ -26,8 +27,16 @@ export class LabelService {
       this.labelsSubject.next(this.labels);
     }
   }
+
   getLabels(): Observable<Label[]> {
     return this.labelsSubject.asObservable();
+  }
+
+  async updateAllLabels(userId: string, newLabels: Label[]) {
+    const currentLabels = this.labelsSubject.getValue();
+    const updatedLabels = this.dataSync.mergeAndUpdateItems(currentLabels, newLabels);
+    this.labelsSubject.next(updatedLabels);
+    await this.offlineStorage.saveUserLabels(userId, updatedLabels);
   }
 
   async updateLabel(updatedLabel: Label): Promise<void> {
@@ -67,10 +76,12 @@ export class LabelService {
     this.labelsSubject.next([...this.labels])
   }
 
-  async deletLabel(index:number) {
+  async deletLabel(index: number) {
+    const deletedLabel = this.labels[index];
     this.labels.splice(index, 1);
     await this.saveLabels();
-    this.labelsSubject.next([...this.labels])
+    this.labelsSubject.next([...this.labels]);
+    return deletedLabel
   }
 
   async setLabel() {

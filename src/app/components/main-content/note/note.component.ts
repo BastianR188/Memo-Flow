@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { AttachmentService } from '../../../services/attachment.service';
 import { NoteService } from '../../../services/note.service';
 import { ColorService } from '../../../services/color.service';
-import { EditingNoteComponent } from "../editing-note/editing-note.component";
 import { MatMenuModule } from '@angular/material/menu';
 import { ClickOutsideDirective } from '../../../services/click-outside.directive';
 import { ChecklistService } from '../../../services/checklist.service';
@@ -16,7 +15,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-note',
   standalone: true,
-  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule, EditingNoteComponent, MatMenuModule, ClickOutsideDirective, AutosizeModule],
+  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule, MatMenuModule, ClickOutsideDirective, AutosizeModule],
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.scss']
 })
@@ -46,18 +45,17 @@ export class NoteComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.colors = this.colorService.getColors(); // Lade die Farben
     this.sortOrder();
-    this.labelSubscription = this.labelService.labels$.subscribe(() => {
-      this.validateAndCleanLabels();
-    });
   }
+
   ngOnDestroy() {
     if (this.labelSubscription) {
       this.labelSubscription.unsubscribe();
     }
   }
+
   validateAndCleanLabels() {
     const validLabels = new Map(this.labelService.labels.map(label => [label.id, label]));
-    
+
     this.note.labels = this.note.labels.map(noteLabel => {
       const validLabel = validLabels.get(noteLabel.id);
       if (validLabel) {
@@ -67,7 +65,6 @@ export class NoteComponent implements OnInit, OnDestroy {
       return null;
     }).filter((label): label is Label => label !== null);
   }
-  
 
   get uncheckedItems(): ChecklistItem[] {
     return this.note.checklistItems.filter(item => !item.checked);
@@ -82,15 +79,18 @@ export class NoteComponent implements OnInit, OnDestroy {
     this.setOrder(itemList, event);
     this.updateChecklistOrder();
   }
+
   private setOrder(itemList: ChecklistItem[], event: CdkDragDrop<ChecklistItem[], ChecklistItem[], any>) {
     moveItemInArray(itemList, event.previousIndex, event.currentIndex);
     itemList.forEach((item, index) => {
       item.order = index;
     });
   }
+
   selectLabel(id: string) {
     this.noteService.setSelectedLabel(id);
   }
+
   openDropdown(dropdownId: string) {
     if (dropdownId === 'color') {
       this.isDropdownColorOpen = true;
@@ -111,18 +111,17 @@ export class NoteComponent implements OnInit, OnDestroy {
         this.isDropdownLabelOpen = false;
       }
     })
-
   }
 
   ifNoteInLabels(id: string): boolean {
     return this.note.labels.some(label => label.id === id);
   }
-  
 
   selectColor(color: string) {
     this.note.color = color;
     this.isDropdownColorOpen = false;
   }
+
   updateChecklistOrder() {
     // Sortiere die gesamte Checkliste basierend auf der `order`-Eigenschaft
     this.note.checklistItems.sort((a, b) => a.order - b.order);
@@ -176,7 +175,6 @@ export class NoteComponent implements OnInit, OnDestroy {
   }
 
   async saveNote() {
-    console.log('dieser Note wird geupdatet', this.note)
     await this.noteService.updateNote(this.note);
     // this.pinStatusChanged.emit();
   }
@@ -222,6 +220,7 @@ export class NoteComponent implements OnInit, OnDestroy {
       this.focusNewItem(newItem.id);
     });
   }
+
   focusNewItem(id: string): void {
     setTimeout(() => {
       const newItem = document.getElementById(`item-${id}`);
@@ -230,6 +229,7 @@ export class NoteComponent implements OnInit, OnDestroy {
       }
     });
   }
+
   removeChecklistItem(itemId: string) {
     const index = this.note.checklistItems.findIndex(item => item.id === itemId);
     if (index !== -1) {
@@ -242,23 +242,15 @@ export class NoteComponent implements OnInit, OnDestroy {
       const index = this.note.labels.findIndex(label => label.id === id);
       if (index !== -1) {
         this.note.labels.splice(index, 1);
-        console.log(`Label mit ID ${id} wurde aus der Note entfernt.`);
       }
     } else {
       const labelToAdd = this.labelService.labels.find(label => label.id === id);
-    if (labelToAdd) {
-      const labelExists = this.note.labels.some(label => label.id === id);
-      if (!labelExists) {
-        this.note.labels.push(labelToAdd);
-        console.log(`Label "${labelToAdd.name}" wurde zur Note " ${this.note}" hinzugefügt.`);
-      } else {
-        console.log(`Label "${labelToAdd.name}" existiert bereits in dieser Note.`);
+      if (labelToAdd) {
+        const labelExists = this.note.labels.some(label => label.id === id);
+        if (!labelExists) {
+          this.note.labels.push(labelToAdd);
+        }
       }
-    } else {
-      console.log(`Label mit ID ${id} wurde nicht gefunden.`);
     }
-    }
-    
   }
-
 }

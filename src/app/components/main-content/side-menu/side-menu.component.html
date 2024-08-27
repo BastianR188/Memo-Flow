@@ -33,4 +33,6 @@
         <div class="text-ellipsis label-icon">{{label.name}}</div>
     </div>
     <button (click)="goToTrash()">Papierkorb</button>
+    <button (click)="loadFirebaseNotes()" [disabled]="firebaseService.isLoading">load Firebase</button>
+    <button (click)="saveFirebaseNotes()" [disabled]="firebaseService.isLoading">save Firebase</button>
 </div>

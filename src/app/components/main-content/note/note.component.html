@@ -178,7 +178,7 @@
                             <div class="footer-menu-drop">
 
                                 <div *ngFor="let label of labelService.labels" class="label-item label-btn-menu"
-                                    (click)="toggleLabel(label.id)">
+                                    (click)="toggleLabel(label.id); saveNote()">
                                     <img *ngIf="ifNoteInLabels(label.id)" class="icon"
                                         src=".\assets\icons\checkbox-check.svg" alt="">
                                     <img *ngIf="!ifNoteInLabels(label.id)" class="icon"
