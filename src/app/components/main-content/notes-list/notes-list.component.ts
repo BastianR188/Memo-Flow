@@ -10,11 +10,12 @@ import { ColorService } from '../../../services/color.service';
 import { AutosizeModule } from 'ngx-autosize';
 import { LabelService } from '../../../services/label.service';
 import { ClickOutsideDirective } from '../../../services/click-outside.directive';
+import { CdkDragDrop, CdkDragPreview, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-notes-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, NoteComponent, AutosizeModule,ClickOutsideDirective],
+  imports: [CommonModule, FormsModule, NoteComponent, AutosizeModule, ClickOutsideDirective, DragDropModule, CdkDragPreview],
   templateUrl: './notes-list.component.html',
   styleUrls: ['./notes-list.component.scss']
 })
@@ -45,7 +46,14 @@ export class NotesListComponent implements OnInit {
   ngOnInit() {
     this.colors = this.colorService.getColors();
   }
-
+  drop(event: CdkDragDrop<Note[]>, isPinned:boolean) {
+    const itemList = isPinned ? this.noteService.pinnedNotes : this.noteService.unpinnedNotes;
+    moveItemInArray(itemList, event.previousIndex, event.currentIndex);
+    itemList.forEach((item, index) => {
+      item.order = index;
+    });
+    this.noteService.updateOfflineAllNotes(this.noteService.userId, [...this.noteService.pinnedNotes, ...this.noteService.unpinnedNotes]);
+  }
   async createNote() {
     const hasContent = this.isChecklist
       ? this.checklistItems.some(item => item.text.length > 0)
@@ -72,9 +80,31 @@ export class NotesListComponent implements OnInit {
       editAt: null,
       delete: false,
       labels: this.labels,
-      order: this.noteService.notes.length
+      order: 0, // Setze immer auf 0 für neue Notizen
+      // ... andere Eigenschaften
     };
+
+    // Verschiebe alle anderen Notizen um eine Position nach unten
+    this.shiftNotesOrder(newNote.isPinned);
+
+    // Füge die neue Notiz hinzu
+    if (newNote.isPinned) {
+      this.noteService.pinnedNotes.unshift(newNote);
+    } else {
+      this.noteService.unpinnedNotes.unshift(newNote);
+    }
+
+    // Aktualisiere alle Notizen
+    this.noteService.updateOfflineAllNotes(this.userId, [...this.noteService.pinnedNotes, ...this.noteService.unpinnedNotes]);
+
     return newNote;
+  }
+
+  private shiftNotesOrder(isPinned: boolean) {
+    const notesToShift = isPinned ? this.noteService.pinnedNotes : this.noteService.unpinnedNotes;
+    notesToShift.forEach(note => {
+      note.order += 1;
+    });
   }
 
   openDropdown(dropdownId: string) {
@@ -82,7 +112,7 @@ export class NotesListComponent implements OnInit {
       this.isDropdownColorOpen = true;
     } else if (dropdownId === 'label') {
       this.isDropdownLabelOpen = true;
-    } 
+    }
   }
 
   onClickOutside(dropdownId: string) {
@@ -190,22 +220,41 @@ export class NotesListComponent implements OnInit {
       }
     } else {
       const labelToAdd = this.labelService.labels.find(label => label.id === id);
-    if (labelToAdd) {
-      const labelExists = this.labels.some(label => label.id === id);
-      if (!labelExists) {
-        this.labels.push(labelToAdd);
+      if (labelToAdd) {
+        const labelExists = this.labels.some(label => label.id === id);
+        if (!labelExists) {
+          this.labels.push(labelToAdd);
+        } else {
+          console.log(`Label "${labelToAdd.name}" existiert bereits in dieser Note.`);
+        }
       } else {
-        console.log(`Label "${labelToAdd.name}" existiert bereits in dieser Note.`);
+        console.log(`Label mit ID ${id} wurde nicht gefunden.`);
       }
-    } else {
-      console.log(`Label mit ID ${id} wurde nicht gefunden.`);
     }
-    }
-    
+
   }
 
-  onPinStatusChanged() {
+  onDrop(event: CdkDragDrop<Note[]>, isPinned: boolean) {
+    const itemList = isPinned ? this.noteService.pinnedNotes : this.noteService.unpinnedNotes;
+    this.setOrder(itemList, event)  
+    this.noteService.updateOfflineAllNotes(this.noteService.userId, [...this.noteService.pinnedNotes, ...this.noteService.unpinnedNotes]);
   }
 
+  private setOrder(itemList: Note[], event: CdkDragDrop<Note[], Note[], any>){
+    moveItemInArray(itemList, event.previousIndex, event.currentIndex);
+    itemList.forEach((item, index) => {
+      item.order = index;
+    });
+  }
 
+  // Benutzerdefinierte Vorschau für die gezogene Notiz
+  dragPreview(note: Note) {
+    const previewElement = document.createElement('div');
+    previewElement.classList.add('note-preview');
+    previewElement.innerHTML = `
+      <h3>${note.title}</h3>
+      <p>${note.content.substring(0, 50)}...</p>
+    `;
+    return previewElement;
+  }
 }

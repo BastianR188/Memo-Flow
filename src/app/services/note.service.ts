@@ -52,9 +52,12 @@ export class NoteService {
     const filteredNotes = this.selectedLabel 
       ? notes.filter(note => note.labels.some(label => label.id === this.selectedLabel))
       : notes;
-
-    this.pinnedNotes = filteredNotes.filter(note => note.isPinned && !note.delete);
-    this.unpinnedNotes = filteredNotes.filter(note => !note.isPinned && !note.delete);
+    this.pinnedNotes = filteredNotes
+      .filter(note => note.isPinned && !note.delete)
+      .sort((a, b) => a.order - b.order);
+    this.unpinnedNotes = filteredNotes
+      .filter(note => !note.isPinned && !note.delete)
+      .sort((a, b) => a.order - b.order);
     this.deletedNotes = notes.filter(note => note.delete);
   }
 
