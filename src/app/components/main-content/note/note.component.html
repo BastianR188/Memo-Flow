@@ -7,9 +7,9 @@
         <div *ngIf="!note.delete" class="pinn-container">
             <span class="pinn">
                 <img *ngIf="note.isPinned" class="icon" style="background-color: rgba(255, 255, 255, 0.6);"
-                    (click)="togglePinNote();saveNote()" src="assets/icons/pin-black.svg" alt="Pinned">
+                    (click)="togglePinNote()" src="assets/icons/pin-black.svg" alt="Pinned">
                 <img *ngIf="!note.isPinned" class="icon" style="background-color: rgba(128, 128, 128, 0.2);"
-                    (click)="togglePinNote();saveNote()" src="assets/icons/pin-white.svg" alt="Not pinned">
+                    (click)="togglePinNote()" src="assets/icons/pin-white.svg" alt="Not pinned">
             </span>
         </div>
     </div>

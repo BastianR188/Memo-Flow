@@ -19,7 +19,7 @@
                 <img (click)="removeLabel(label)" class="icon close" src=".\assets\icons\close.svg" alt="">
                 <div *ngIf="isEditLabel == i" class="label-item">
                     <input class="label-name" [(ngModel)]="editInputName" type="text" name="" id="">
-                    <img (click)="setLabel(i)" class="icon" src=".\assets\icons\check.svg" alt="">
+                    <img (click)="setLabel(label, i)" class="icon" src=".\assets\icons\check.svg" alt="">
                 </div>
                 <div *ngIf="isEditLabel != i" class="label-item">
                     <div class="label-name">{{label.name}}</div>

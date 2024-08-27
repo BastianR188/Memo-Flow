@@ -155,6 +155,7 @@ export class NoteComponent implements OnInit, OnDestroy {
 
   togglePinNote() {
     this.note.isPinned = !this.note.isPinned;
+    this.saveNote();
   }
 
   toggleCompletedItems() {

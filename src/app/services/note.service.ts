@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Note } from '../model/note';
+import { Label, Note } from '../model/note';
 import { OfflineStorageService } from './offline-storage.service';
 import { FirebaseService } from './firebase.service';
 import { LabelService } from './label.service';
@@ -12,7 +12,7 @@ import { DataSyncService } from './data-sync.service';
 export class NoteService {
   notes: Note[] = [];
   private notesSubject = new BehaviorSubject<Note[]>([]);
-  
+
   userId: string = '';
   openTrash: boolean = false;
   pinnedNotes: Note[] = [];
@@ -30,26 +30,26 @@ export class NoteService {
   getAlId() {
     let noteIds: string[] = [];
     let labelIds: string[] = [];
-  
+
     this.notes.forEach((item) => {
       noteIds.push(item.id);
     });
-  
+
     this.labelService.labels.forEach((item) => {
       labelIds.push(item.id);
     });
-  
+
     let data = {
       noteIds: noteIds,
       labelIds: labelIds,
       userId: this.userId
     };
-  
+
     return data;
   }
 
   sortNotes(notes: Note[]) {
-    const filteredNotes = this.selectedLabel 
+    const filteredNotes = this.selectedLabel
       ? notes.filter(note => note.labels.some(label => label.id === this.selectedLabel))
       : notes;
     this.pinnedNotes = filteredNotes
@@ -80,20 +80,26 @@ export class NoteService {
     }
   }
 
-  private async saveNotes(notes:Note[]): Promise<void> {
+  private async saveNotes(notes: Note[]): Promise<void> {
     if (this.userId) {
       await this.offlineStorage.saveUserNotes(this.userId, notes);
     } else {
       console.log('UserId nicht gefunden! Es wurde nicht gespeichert!')
     }
   }
-  async removeLabelFromAllNotes(labelId: string) {
+  async updateLabelsInAllNotes(updatedLabel: Label, isDeleted: boolean = false) {
     const notes = this.getCurrentNotes();
     const updatedNotes = notes.map(note => {
-      if (note.labels && note.labels.some(label => label.id === labelId)) {
+      if (note.labels && note.labels.some(label => label.id === updatedLabel.id)) {
         return {
           ...note,
-          labels: note.labels.filter(label => label.id !== labelId)
+          labels: isDeleted
+            ? note.labels.filter(label => label.id !== updatedLabel.id)
+            : note.labels.map(label =>
+              label.id === updatedLabel.id
+                ? { ...label, name: updatedLabel.name, color: updatedLabel.color }
+                : label
+            )
         };
       }
       return note;
@@ -101,6 +107,8 @@ export class NoteService {
 
     await this.updateOfflineAllNotes(this.userId, updatedNotes);
   }
+
+
   // Methode, um das Observable zu erhalten
   getNotes(): Observable<Note[]> {
     return this.notes$;
@@ -116,7 +124,7 @@ export class NoteService {
     await this.offlineStorage.saveUserNotes(userId, newNotes);
   }
 
-  async updateAllNotes(userId:string, newNotes: Note[]) {
+  async updateAllNotes(userId: string, newNotes: Note[]) {
     const currentNotes = this.notesSubject.getValue();
     const updatedNotes = this.dataSync.mergeAndUpdateItems<Note>(currentNotes, newNotes);
     this.notesSubject.next(updatedNotes);
@@ -131,13 +139,14 @@ export class NoteService {
   }
 
   async updateNote(updatedNote: Note): Promise<void> {
-    const index = this.notes.findIndex(note => note.id === updatedNote.id);
-    if (index !== -1) {
-      updatedNote.editAt = new Date();
-      this.notes[index] = updatedNote;
+    updatedNote.editAt = new Date();
+    const updatedNotes = this.notes.map(note =>
+      note.id === updatedNote.id ? { ...note, ...updatedNote } : note
+    );
+      this.notes = updatedNotes;
       await this.saveNotes(this.notes);
-      this.notesSubject.next([...this.notes]);
-    }
+      this.notesSubject.next(this.notes);
+      this.sortNotes(this.notes)
   }
 
   async deleteNote(id: string): Promise<void> {

@@ -73,11 +73,12 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     this.isEditLabel = index;
   }
 
-  setLabel(i: number) {
+  setLabel(label:Label, i: number) {
     this.label.labels[i].name = this.editInputName;
     this.isEditLabel = -1;
     this.editInputName = '';
     this.label.setLabel();
+    this.noteService.updateLabelsInAllNotes(label, false);
   }
 
   abortNewLabel() {
@@ -93,7 +94,7 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     if (index !== -1) {
       const deletedLabel = await this.label.deletLabel(index);
       if (deletedLabel) {
-        this.noteService.removeLabelFromAllNotes(deletedLabel.id);
+        this.noteService.updateLabelsInAllNotes(deletedLabel, true);
       }
     } else {
       console.log(`Label not found: ${label}`);
