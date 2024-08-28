@@ -68,7 +68,13 @@ input {
         transition: all 250ms ease-in-out;
     }
 }
-
+.title {
+    min-width: 350px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 64px;
+}
 .full-width {
     width: 100%;
 }

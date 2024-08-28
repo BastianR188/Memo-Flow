@@ -6,6 +6,7 @@ import { LabelService } from '../../../services/label.service';
 import { CommonModule } from '@angular/common';
 import { combineLatest, distinctUntilChanged, Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-header-menu',
@@ -19,7 +20,7 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   private subscription!: Subscription;
   searchTerm: string = '';
   private searchSubscription!: Subscription;
-  constructor(private router: Router, private noteService: NoteService, public firebaseService: FirebaseService, private labelService: LabelService) { }
+  constructor(private router: Router, private noteService: NoteService, public firebaseService: FirebaseService, private labelService: LabelService, private authService: AuthService) { }
   ngOnInit() {
     this.searchSubscription = this.noteService.searchTerm$.subscribe(term => {
       this.searchTerm = term;
@@ -37,6 +38,7 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     });
   }
   ngOnDestroy() {
+    this.authService.logout();
     if (this.searchSubscription) {
       this.searchSubscription.unsubscribe();
     }
@@ -66,8 +68,11 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   onSearchChange(term: string) {
     this.noteService.setSearchTerm(term);
   }
-
+  logout() {
+    this.authService.logout();
+  }
   goToLogin() {
+    this.authService.logout();
     this.router.navigate(['']);
     this.noteService.openTrash = false;
     this.noteService.clearSelectedLabel();

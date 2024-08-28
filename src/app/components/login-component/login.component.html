@@ -1,2 +1,20 @@
-<input [(ngModel)]="userId" placeholder="Enter User ID">
-<button (click)="login()">Login</button>
+<div class="main">
+    <div class="login-container">
+        <h2>Login</h2>
+        <form (ngSubmit)="login()">
+            <div class="input-group">
+                <label for="userId">User ID</label>
+                <input type="text" id="userId" name="userId" [(ngModel)]="userId" required
+                    placeholder="Enter your User ID">
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" [(ngModel)]="password" required
+                    placeholder="Enter your password">
+            </div>
+            <div class="button-container">
+                <button type="submit">Log In</button>
+            </div>
+        </form>
+    </div>
+</div>
