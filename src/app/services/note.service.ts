@@ -65,6 +65,7 @@ export class NoteService {
     this.selectedLabel = labelId;
     this.sortNotes(this.notes);
     this.notesSubject.next([...this.pinnedNotes, ...this.unpinnedNotes, ...this.deletedNotes]);
+
   }
 
   clearSelectedLabel() {

@@ -33,6 +33,7 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
   goToTrash() {
+    this.noteService.clearSelectedLabel()
     this.noteService.openTrash = true;
   }
 
@@ -101,21 +102,5 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     }
   }
 
-  async loadFirebaseNotes() {
-    this.firebaseService.isLoading = true;
-    let data = await (this.firebaseService.getUserDataAndRelatedItems(this.noteService.userId))
-    if (data?.notes) {
-      await this.noteService.updateAllNotes(this.noteService.userId, data.notes)
-    }
-    if (data?.labels) {
-      await this.label.updateAllLabels(this.noteService.userId, data.labels)
-    }
-    this.firebaseService.isLoading = false;
-  }
 
-  async saveFirebaseNotes() {
-    this.firebaseService.isLoading = true;
-    await this.firebaseService.saveUserData(this.noteService.userId);
-    this.firebaseService.isLoading = false;
-  }
 }

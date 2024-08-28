@@ -7,11 +7,12 @@ import { TrashComponent } from "../trash/trash.component";
 import { CommonModule } from '@angular/common';
 import { LabelService } from '../../../services/label.service';
 import { Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { HeaderMenuComponent } from '../header-menu/header-menu.component';
 
 @Component({
   selector: 'app-main-page',
   standalone: true,
-  imports: [NotesListComponent, SideMenuComponent, TrashComponent, CommonModule],
+  imports: [NotesListComponent, SideMenuComponent, TrashComponent, CommonModule, HeaderMenuComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss'
 })

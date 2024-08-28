@@ -1,0 +1,34 @@
+div[role="button"] {
+    cursor: pointer;
+    /* Andere Stile für den Button-Look */
+}
+
+div[role="button"].disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    /* Andere Stile für den deaktivierten Zustand */
+}
+
+.main {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 16px;
+}
+.btn-box{
+    display: flex;
+    align-items: center;
+    height: 32px;
+    cursor: pointer;
+    transition: all 250ms ease;
+    padding: 8px 0;
+    border-radius: 0 0px 16px 16px;
+    width: 140px;
+    &:hover {
+        transform: scale(1.1);
+        background-color: rgba($color: grey, $alpha: 0.2);
+    }
+    img {
+        height: 36px;
+        width: 36px;
+        padding: 0 8px;
+    }}

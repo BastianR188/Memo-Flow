@@ -1,0 +1,22 @@
+<div class="main">
+    <div>{{title}}</div>
+    <div></div>
+    <div class="main">
+        <div (click)="loadFirebaseNotes()" class="btn-box" [ngClass]="{'disabled': firebaseService.isLoading}"
+            role="button" [attr.aria-disabled]="firebaseService.isLoading">
+            <img src=".\assets\icons\load.svg" alt="">
+            <div>load from Cloud</div>
+        </div>
+        <div (click)="saveFirebaseNotes()" class="btn-box" [ngClass]="{'disabled': firebaseService.isLoading}"
+            role="button" [attr.aria-disabled]="firebaseService.isLoading">
+            <img src=".\assets\icons\save.svg" alt="">
+            <div>Save in Cloud</div>
+        </div>
+        <div class="btn-box">
+            <img src=".\assets\icons\logout.svg" alt="">
+            <div (click)="goToLogin()">Ausloggen</div>
+        </div>
+    </div>
+
+
+</div>

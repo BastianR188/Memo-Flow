@@ -1,11 +1,35 @@
 .main {
     display: flex;
     flex-direction: column;
-    max-width: 120px;
-    gap: 16px;
-    padding: 24px;
+    width: 160px;
+    gap: 4px;
+    height: calc(100vh - 64px);
+    padding-top: 16px;
 }
+.btn-box{
+    display: flex;
+    align-items: center;
+    height: 32px;
+    cursor: pointer;
+    transition: all 250ms ease;
+    padding: 8px 0;
+    border-radius: 0 16px 16px 0;
+    width: 140px;
+    &:hover {
+        transform: scale(1.1);
+        background-color: rgba($color: grey, $alpha: 0.2);
+    }
+    img {
+        height: 36px;
+        width: 36px;
+        padding: 0 8px;
+    }
 
+}
+.selected-label {
+    background-color: #e0e0e0;
+    border-radius: 0 16px 16px 0;
+}
 button {
     height: 36px;
     cursor: pointer;
@@ -15,7 +39,12 @@ button {
     border-bottom: solid 1px rgba($color: grey, $alpha: 0.3);
     margin: 4px 0;
 }
-
+.label-box {
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    border-radius: 0 16px 16px 0;
+}
 .dropdown-menu {
     position: absolute;
     bottom: auto;
@@ -59,12 +88,17 @@ button {
 
 .label-item {
     display: flex;
-    width: 100%;
+    width: 120px;
     align-items: center;
-    border-radius: 16px;
+    border-radius: 0 16px 16px 0;
     padding: 0 8px;
+
     &.selected-label {
         background-color: #e0e0e0;
+        border-radius: 0 16px 16px 0;
+    }
+    &.transform-label {
+        transform: translateX(15px);
     }
 }
 

@@ -1,17 +1,23 @@
 <div class="main">
-    <button (click)="goToNote();goToLogin()">Ausloggen</button>
-    <button (click)="goToNote()">Notizen</button>
+    <div class="btn-box" [ngClass]="{'selected-label': !noteService.openTrash && noteService.selectedLabel === ''}">
+        <img src=".\assets\icons\note.svg" alt="">
+        <div (click)="goToNote()" >Notizen</div>
+    </div>
 
     <div class="color-selector" (click)="openDropdown('addLabel')"
         (clickOutside)="onClickOutside('addLabel'); isEditLabel = -1; inputLabel = ''">
-        <button>Label bearbeiten</button>
+        <div class="btn-box">
+            <img src=".\assets\icons\edit.svg" alt="">
+            <div>Labels bearbeiten</div>
+        </div>
         <div class="dropdown-menu label-dropmenu" *ngIf="addLabelDropdown">
             <div>
                 <div>Neues Label erstellen</div>
                 <div class="dropdown-container close-hover">
                     <img (click)="abortNewLabel()" class="icon close" src=".\assets\icons\close.svg" alt="">
                     <input class="label-name" type="text" [(ngModel)]="inputLabel">
-                    <img *ngIf="inputLabel.length != 0" (click)="addNewLabel()" class="icon" src=".\assets\icons\check.svg" alt="">
+                    <img *ngIf="inputLabel.length != 0" (click)="addNewLabel()" class="icon"
+                        src=".\assets\icons\check.svg" alt="">
                 </div>
             </div>
             <div class="stroke"></div>
@@ -28,11 +34,19 @@
             </div>
         </div>
     </div>
-    <div *ngFor="let label of this.label.labels" class="label-item label" (click)="selectLabel(label.id)" [ngClass]="{'selected-label': label.id === noteService.selectedLabel}">
-        <img class="icon label-icon" src=".\assets\icons\label.svg" alt="">
-        <div class="text-ellipsis label-icon">{{label.name}}</div>
+    <div class="label-box" style="padding: 8px 0">
+        <div *ngFor="let label of this.label.labels" class="label-item label btn-box" (click)="selectLabel(label.id)"
+            [ngClass]="{'selected-label': label.id === noteService.selectedLabel}">
+            <div class="label-item label " [ngClass]="{'transform-label': label.id === noteService.selectedLabel}">
+                <img class="icon label-icon" 
+                    src=".\assets\icons\label.svg" alt="">
+                <div class="text-ellipsis label-icon"
+                    >{{label.name}}</div>
+            </div>
+        </div>
     </div>
-    <button (click)="goToTrash()">Papierkorb</button>
-    <button (click)="loadFirebaseNotes()" [disabled]="firebaseService.isLoading">load Firebase</button>
-    <button (click)="saveFirebaseNotes()" [disabled]="firebaseService.isLoading">save Firebase</button>
+    <div class="btn-box" [ngClass]="{'selected-label': noteService.openTrash}">
+        <img src=".\assets\icons\trash.svg" alt="">
+        <div (click)="goToTrash()">Papierkorb </div>
+    </div>
 </div>
