@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { NoteService } from '../../../services/note.service';
 import { AttachmentService } from '../../../services/attachment.service';
 import { ChecklistService } from '../../../services/checklist.service';
@@ -11,6 +11,7 @@ import { AutosizeModule } from 'ngx-autosize';
 import { LabelService } from '../../../services/label.service';
 import { ClickOutsideDirective } from '../../../services/click-outside.directive';
 import { CdkDragDrop, CdkDragPreview, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-notes-list',
@@ -35,6 +36,8 @@ export class NotesListComponent implements OnInit {
   attachments: ImageAttachment[] = [];
   checklistItems: ChecklistItem[] = [];
   colors: { name: string, value: string }[] = []; // Array für die Farben
+  pinnedNotes$!: Observable<Note[]>;
+  unpinnedNotes$!: Observable<Note[]>;
   constructor(
     public noteService: NoteService,
     private attachmentService: AttachmentService,
@@ -45,6 +48,8 @@ export class NotesListComponent implements OnInit {
 
   ngOnInit() {
     this.colors = this.colorService.getColors();
+      this.pinnedNotes$ = this.noteService.filteredPinnedNotes$;
+      this.unpinnedNotes$ = this.noteService.filteredUnpinnedNotes$;
   }
   drop(event: CdkDragDrop<Note[]>, isPinned:boolean) {
     const itemList = isPinned ? this.noteService.pinnedNotes : this.noteService.unpinnedNotes;

@@ -26,20 +26,22 @@ export class SideMenuComponent implements OnInit, OnDestroy {
   constructor(public noteService: NoteService, private router: Router, public firebaseService: FirebaseService, public label: LabelService) { }
   ngOnInit() {
     this.subscription = this.label.getLabels().subscribe(
-      labels => this.label.labels = labels
+      labels => this.label._labels = labels
     );
   }
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
   goToTrash() {
-    this.noteService.clearSelectedLabel()
+    this.noteService.clearSelectedLabel();
     this.noteService.openTrash = true;
+    this.noteService.clearSearchTerm();
   }
 
   goToNote() {
     this.noteService.openTrash = false;
     this.noteService.clearSelectedLabel();
+    this.noteService.clearSearchTerm();
   }
 
   goToLogin() {
@@ -87,7 +89,9 @@ export class SideMenuComponent implements OnInit, OnDestroy {
   }
 
   selectLabel(id: string) {
+    this.noteService.openTrash = false;
     this.noteService.setSelectedLabel(id);
+    this.noteService.clearSearchTerm();
   }
 
   async removeLabel(label: Label) {

@@ -107,14 +107,14 @@
     <div *ngIf="noteService.pinnedNotes.length != 0" style="width: 100%;">
         <h2>Angepinnte Notizen</h2>
         <div class="note-board" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="drop($event, true)">
-            <div *ngFor="let note of noteService.pinnedNotes" cdkDrag>
+            <div *ngFor="let note of pinnedNotes$ | async" cdkDrag>
                 <app-note class="drag-div" [note]="note"></app-note>
             </div>
         </div>
     </div>
 
     <div class="note-board" style="width: 100%;" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="drop($event, false)">
-        <div *ngFor="let note of noteService.unpinnedNotes" cdkDrag>
+        <div *ngFor="let note of unpinnedNotes$ | async" cdkDrag>
             <app-note class="drag-div" [note]="note"></app-note>
         </div>
     </div>

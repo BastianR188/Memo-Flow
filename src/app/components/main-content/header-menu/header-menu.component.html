@@ -1,16 +1,31 @@
 <div class="main">
-    <div>{{title}}</div>
-    <div></div>
+    <h1 style="width: 452px;">{{title}}</h1>
+
+    <div class="input-container">
+        <img style="left: 8px;" src=".\assets\icons\search.svg" alt="">
+        <input type="text" class="full-width" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange($event)">
+        <img *ngIf="searchTerm.length != 0" (click)="clearSearchTerm()" class="close" style="right: 8px;"
+            src=".\assets\icons\close.svg" alt="">
+    </div>
+
     <div class="main">
-        <div (click)="loadFirebaseNotes()" class="btn-box" [ngClass]="{'disabled': firebaseService.isLoading}"
-            role="button" [attr.aria-disabled]="firebaseService.isLoading">
-            <img src=".\assets\icons\load.svg" alt="">
-            <div>load from Cloud</div>
+        <div class="main-loading">
+            <div (click)="loadFirebaseNotes()" class="btn-box" [ngClass]="{'disabled': firebaseService.isLoading}"
+                role="button" [attr.aria-disabled]="firebaseService.isLoading">
+                <img src=".\assets\icons\load.svg" alt="">
+                <div>load from Cloud</div>
+            </div>
+            <img class="loading" *ngIf="firebaseService.isLoading" src=".\assets\icons\loading.svg" alt="">
         </div>
-        <div (click)="saveFirebaseNotes()" class="btn-box" [ngClass]="{'disabled': firebaseService.isLoading}"
-            role="button" [attr.aria-disabled]="firebaseService.isLoading">
-            <img src=".\assets\icons\save.svg" alt="">
-            <div>Save in Cloud</div>
+
+        <div class="main-loading">
+            <div (click)="saveFirebaseNotes()" class="btn-box" [ngClass]="{'disabled': firebaseService.isLoading}"
+                role="button" [attr.aria-disabled]="firebaseService.isLoading">
+                <img src=".\assets\icons\save.svg" alt="">
+                <div>Save in Cloud</div>
+            </div>
+           
+            <img class="loading" *ngIf="firebaseService.isLoading" src=".\assets\icons\loading.svg" alt="">
         </div>
         <div class="btn-box">
             <img src=".\assets\icons\logout.svg" alt="">

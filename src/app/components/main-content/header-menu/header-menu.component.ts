@@ -5,40 +5,47 @@ import { FirebaseService } from '../../../services/firebase.service';
 import { LabelService } from '../../../services/label.service';
 import { CommonModule } from '@angular/common';
 import { combineLatest, distinctUntilChanged, Subscription } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-header-menu',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './header-menu.component.html',
   styleUrl: './header-menu.component.scss'
 })
 export class HeaderMenuComponent implements OnInit, OnDestroy {
   title: string = 'Notizen';
-  private subscription: Subscription;
+  private subscription!: Subscription;
+  searchTerm: string = '';
+  private searchSubscription!: Subscription;
   constructor(private router: Router, private noteService: NoteService, public firebaseService: FirebaseService, private labelService: LabelService) { }
   ngOnInit() {
-    // Kombinieren Sie die relevanten Observables
+    this.searchSubscription = this.noteService.searchTerm$.subscribe(term => {
+      this.searchTerm = term;
+    });
     this.subscription = combineLatest([
-      this.noteService.selectedLabel,
-      this.noteService.openTrash,
-      this.labelService.labels
+      this.noteService.selectedLabel$,
+      this.noteService.openTrash$,
+      this.labelService.labels$
     ]).pipe(
-      distinctUntilChanged((prev, curr) => 
+      distinctUntilChanged((prev, curr) =>
         prev[0] === curr[0] && prev[1] === curr[1] && prev[2].length === curr[2].length
       )
     ).subscribe(() => {
       this.change();
     });
   }
-
   ngOnDestroy() {
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
   }
   change() {
-    if (this.noteService.selectedLabel === '' && this.noteService.openTrash) {
+    if (this.noteService.selectedLabel === '' && !this.noteService.openTrash) {
       this.title = 'Notizen';
     } else if (this.noteService.openTrash) {
       this.title = 'Papierkorb';
@@ -50,6 +57,14 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
         this.title = 'Notizen';
       }
     }
+  }
+  clearSearchTerm() {
+    this.searchTerm = '';
+    this.noteService.setSearchTerm('');
+
+  }
+  onSearchChange(term: string) {
+    this.noteService.setSearchTerm(term);
   }
 
   goToLogin() {

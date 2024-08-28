@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 import { Label, Note } from '../model/note';
 import { OfflineStorageService } from './offline-storage.service';
 import { FirebaseService } from './firebase.service';
@@ -14,19 +14,119 @@ export class NoteService {
   private notesSubject = new BehaviorSubject<Note[]>([]);
 
   userId: string = '';
-  openTrash: boolean = false;
   pinnedNotes: Note[] = [];
   unpinnedNotes: Note[] = [];
   deletedNotes: Note[] = [];
-  selectedLabel: string = '';
   notes$ = this.notesSubject.asObservable();
-  constructor(private offlineStorage: OfflineStorageService, private labelService: LabelService, private dataSync: DataSyncService) { }
+  private searchTermSubject = new BehaviorSubject<string>('');
+  searchTerm$ = this.searchTermSubject.asObservable();
+
+  filteredPinnedNotes$: Observable<Note[]>;
+  filteredUnpinnedNotes$: Observable<Note[]>;
+  constructor(private offlineStorage: OfflineStorageService, private labelService: LabelService, private dataSync: DataSyncService) {
+    const filteredNotes$ = combineLatest([
+      this.notes$,
+      this.selectedLabel$,
+      this.searchTerm$
+    ]).pipe(
+      map(([notes, selectedLabel, searchTerm]) => {
+        return this.filterAndSortNotes(notes, selectedLabel, searchTerm);
+      })
+    );
+
+    this.filteredPinnedNotes$ = filteredNotes$.pipe(
+      map(notes => notes.filter(note => note.isPinned))
+    );
+
+    this.filteredUnpinnedNotes$ = filteredNotes$.pipe(
+      map(notes => notes.filter(note => !note.isPinned))
+    );
+  }
+
+
+  clearSearchTerm() {
+    this.searchTermSubject.next('');
+  }
+
+  private selectedLabelSubject = new BehaviorSubject<string>('');
+  selectedLabel$ = this.selectedLabelSubject.asObservable();
+
+  private openTrashSubject = new BehaviorSubject<boolean>(false);
+  openTrash$ = this.openTrashSubject.asObservable();
+
+  get selectedLabel(): string {
+    return this.selectedLabelSubject.value;
+  }
+
+  set selectedLabel(value: string) {
+    this.selectedLabelSubject.next(value);
+  }
+
+  get openTrash(): boolean {
+    return this.openTrashSubject.value;
+  }
+
+  set openTrash(value: boolean) {
+    this.openTrashSubject.next(value);
+  }
+
+  setSearchTerm(term: string) {
+    this.searchTermSubject.next(term);
+  }
+
+  private filterAndSortNotes(notes: Note[], selectedLabel: string, searchTerm: string): Note[] {
+    const filteredNotes = notes.filter(note => {
+      const matchesLabel = !selectedLabel || note.labels.some(label => label.id === selectedLabel);
+
+      const matchesSearch = !searchTerm || this.noteMatchesSearch(note, searchTerm.toLowerCase());
+
+      return matchesLabel && matchesSearch && !note.delete;
+    });
+
+    return filteredNotes.sort((a, b) => a.order - b.order);
+  }
+
+  private noteMatchesSearch(note: Note, searchTerm: string): boolean {
+    // Überprüfe Titel und Inhalt
+    if (note.title.toLowerCase().includes(searchTerm) ||
+      note.content.toLowerCase().includes(searchTerm)) {
+      return true;
+    }
+
+    // Überprüfe Checklisten-Items, falls vorhanden
+    if (note.isChecklist && note.checklistItems) {
+      return note.checklistItems.some(item =>
+        item.text.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    // Optional: Überprüfe Labels
+    if (note.labels && note.labels.length > 0) {
+      return note.labels.some(label =>
+        label.name.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    return false;
+  }
+
 
   async setUserId(userId: string) {
     this.userId = userId;
     await this.loadNotes();
   }
-
+  sortNotes(notes: Note[]) {
+    const filteredNotes = this.selectedLabel
+      ? notes.filter(note => note.labels.some(label => label.id === this.selectedLabel))
+      : notes;
+    this.pinnedNotes = filteredNotes
+      .filter(note => note.isPinned && !note.delete)
+      .sort((a, b) => a.order - b.order);
+    this.unpinnedNotes = filteredNotes
+      .filter(note => !note.isPinned && !note.delete)
+      .sort((a, b) => a.order - b.order);
+    this.deletedNotes = notes.filter(note => note.delete);
+  }
   getAlId() {
     let noteIds: string[] = [];
     let labelIds: string[] = [];
@@ -48,24 +148,12 @@ export class NoteService {
     return data;
   }
 
-  sortNotes(notes: Note[]) {
-    const filteredNotes = this.selectedLabel
-      ? notes.filter(note => note.labels.some(label => label.id === this.selectedLabel))
-      : notes;
-    this.pinnedNotes = filteredNotes
-      .filter(note => note.isPinned && !note.delete)
-      .sort((a, b) => a.order - b.order);
-    this.unpinnedNotes = filteredNotes
-      .filter(note => !note.isPinned && !note.delete)
-      .sort((a, b) => a.order - b.order);
-    this.deletedNotes = notes.filter(note => note.delete);
-  }
+
 
   setSelectedLabel(labelId: string) {
     this.selectedLabel = labelId;
     this.sortNotes(this.notes);
     this.notesSubject.next([...this.pinnedNotes, ...this.unpinnedNotes, ...this.deletedNotes]);
-
   }
 
   clearSelectedLabel() {
@@ -134,6 +222,7 @@ export class NoteService {
 
   async addNote(note: Note): Promise<void> {
     if (!this.userId) throw new Error('User not set');
+    this.clearSearchTerm()
     this.notes.push(note);
     await this.saveNotes(this.notes);
     this.notesSubject.next([...this.notes]);
@@ -144,10 +233,10 @@ export class NoteService {
     const updatedNotes = this.notes.map(note =>
       note.id === updatedNote.id ? { ...note, ...updatedNote } : note
     );
-      this.notes = updatedNotes;
-      await this.saveNotes(this.notes);
-      this.notesSubject.next(this.notes);
-      this.sortNotes(this.notes)
+    this.notes = updatedNotes;
+    await this.saveNotes(this.notes);
+    this.notesSubject.next(this.notes);
+    this.sortNotes(this.notes)
   }
 
   async deleteNote(id: string): Promise<void> {

@@ -9,16 +9,26 @@ import { NoteService } from './note.service';
   providedIn: 'root'
 })
 export class LabelService {
-  labels: Label[] = [];
-  private labelsSubject = new BehaviorSubject<Label[]>([]);
   userId: string = '';
   // Verwaltung von Labels
   // Synchronisation mit Firebase
+  private labelsSubject = new BehaviorSubject<Label[]>([]);
+  labels$ = this.labelsSubject.asObservable();
 
+  _labels: Label[] = [];
   constructor(private offlineStorage: OfflineStorageService, private dataSync: DataSyncService) { }
+  get labels(): Label[] {
+    return this._labels;
+  }
   async setUserId(userId: string) {
     this.userId = userId;
     await this.loadLabels();
+  }
+
+
+  private set labels(value: Label[]) {
+    this._labels = value;
+    this.labelsSubject.next(this._labels);
   }
 
   async loadLabels() {
