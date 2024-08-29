@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -16,12 +16,14 @@ export class LoginComponent {
   password: string = '';
 
   constructor(private router: Router, private authService: AuthService) { }
-
-  login() {
-    if (this.authService.login(this.userId, this.password)) {
+  async login() {
+    if (await this.authService.login(this.userId, this.password)) {
       this.router.navigate(['/notes', this.userId]);
     } else {
       alert('Invalid credentials');
     }
+  }
+  loginWithGoogle() {
+    this.authService.signInWithGoogle();
   }
 }

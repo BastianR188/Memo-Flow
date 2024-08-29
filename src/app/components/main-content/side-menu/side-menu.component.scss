@@ -5,6 +5,9 @@
     gap: 4px;
     height: calc(100vh - 64px);
     padding-top: 16px;
+    box-shadow: 5px 0 15px -10px rgba(0, 0, 0, 0.3);
+    background-color: #ffff;
+
 }
 .btn-box{
     display: flex;

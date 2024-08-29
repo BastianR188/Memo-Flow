@@ -12,7 +12,7 @@ import { DataSyncService } from './data-sync.service';
 export class NoteService {
   notes: Note[] = [];
   private notesSubject = new BehaviorSubject<Note[]>([]);
-
+  darkMode: boolean = false;
   userId: string = '';
   pinnedNotes: Note[] = [];
   unpinnedNotes: Note[] = [];
@@ -42,7 +42,12 @@ export class NoteService {
       map(notes => notes.filter(note => !note.isPinned))
     );
   }
-
+  getNoteAndLabelIds(): { noteIds: string[], labelIds: string[] } {
+    const noteIds = this.notes.map(note => note.id);
+    const labelIds = this.labelService.labelsSubject.value.map(label => label.id);
+    return { noteIds, labelIds };
+  }
+  
 
   clearSearchTerm() {
     this.searchTermSubject.next('');

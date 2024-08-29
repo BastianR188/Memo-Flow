@@ -1,4 +1,14 @@
+
 {
+  "targets": {
+    "memoflow-65786": {
+      "hosting": {
+        "memoflow": [
+          "memoflow-65786"
+        ]
+      }
+    }
+  },
   "projects": {
     "default": "memoflow-65786"
   }

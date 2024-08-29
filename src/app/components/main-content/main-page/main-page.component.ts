@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { LabelService } from '../../../services/label.service';
 import { Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { HeaderMenuComponent } from '../header-menu/header-menu.component';
+import { SettingsService } from '../../../services/settings.service';
 
 @Component({
   selector: 'app-main-page',
@@ -19,7 +20,8 @@ import { HeaderMenuComponent } from '../header-menu/header-menu.component';
 export class MainPageComponent implements OnInit {
   private destroy$ = new Subject<void>();
   constructor(
-    private route: ActivatedRoute, public noteService: NoteService, private labelService: LabelService) {
+    private route: ActivatedRoute, public noteService: NoteService, private labelService: LabelService,
+    private settingsService: SettingsService) {
   }
   ngOnInit() {
     this.route.params.pipe(
@@ -36,7 +38,8 @@ export class MainPageComponent implements OnInit {
   private initializeServices(userId: string) {
     return Promise.all([
       this.noteService.setUserId(userId),
-      this.labelService.setUserId(userId)
+      this.labelService.setUserId(userId),
+      this.settingsService.setUserId(userId)
     ]);
   }
   loadNotes() {

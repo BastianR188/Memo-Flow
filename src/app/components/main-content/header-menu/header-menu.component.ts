@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { combineLatest, distinctUntilChanged, Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
+import { SettingsService } from '../../../services/settings.service';
 
 @Component({
   selector: 'app-header-menu',
@@ -17,11 +18,15 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class HeaderMenuComponent implements OnInit, OnDestroy {
   title: string = 'Notizen';
+  darkMode: boolean = false;
   private subscription!: Subscription;
   searchTerm: string = '';
   private searchSubscription!: Subscription;
-  constructor(private router: Router, private noteService: NoteService, public firebaseService: FirebaseService, private labelService: LabelService, private authService: AuthService) { }
+  constructor(private settingsService: SettingsService, private router: Router, private noteService: NoteService, public firebaseService: FirebaseService, private labelService: LabelService, private authService: AuthService) { }
   ngOnInit() {
+    this.subscription = this.settingsService.darkMode$.subscribe(
+      darkMode => this.darkMode = darkMode
+    );
     this.searchSubscription = this.noteService.searchTerm$.subscribe(term => {
       this.searchTerm = term;
     });
@@ -39,6 +44,9 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy() {
     this.authService.logout();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
     if (this.searchSubscription) {
       this.searchSubscription.unsubscribe();
     }
@@ -46,6 +54,11 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
       this.subscription.unsubscribe();
     }
   }
+
+  toggleDarkMode() {
+    this.settingsService.toggleDarkMode();
+  }
+
   change() {
     if (this.noteService.selectedLabel === '' && !this.noteService.openTrash) {
       this.title = 'Notizen';

@@ -12,7 +12,7 @@ export class LabelService {
   userId: string = '';
   // Verwaltung von Labels
   // Synchronisation mit Firebase
-  private labelsSubject = new BehaviorSubject<Label[]>([]);
+  labelsSubject = new BehaviorSubject<Label[]>([]);
   labels$ = this.labelsSubject.asObservable();
 
   _labels: Label[] = [];

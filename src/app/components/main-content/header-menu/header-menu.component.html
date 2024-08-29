@@ -24,9 +24,16 @@
                 <img src=".\assets\icons\save.svg" alt="">
                 <div>Save in Cloud</div>
             </div>
-           
             <img class="loading" *ngIf="firebaseService.isLoading" src=".\assets\icons\loading.svg" alt="">
         </div>
+            <div class="btn-box" *ngIf="darkMode" (click)="toggleDarkMode()">
+                <img src=".\assets\icons\sun.svg" alt="">
+                <div>Helles Design</div>
+            </div>
+            <div class="btn-box" *ngIf="!darkMode" (click)="toggleDarkMode()">
+                <img src=".\assets\icons\moon.svg" alt="">
+                <div>Dunkles Design</div>
+            </div>
         <div class="btn-box">
             <img src=".\assets\icons\logout.svg" alt="">
             <div (click)="goToLogin()">Ausloggen</div>

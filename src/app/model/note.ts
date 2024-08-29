@@ -19,9 +19,11 @@ export interface Label {
 }
 
 export interface userData {
+    userId: string;
     noteIds: string[];
-        labelIds: string[];
-        // andere Felder...
+    labelIds: string[];
+    darkMode: boolean;
+    // andere Felder...
 }
 
 export interface FirebaseAttachment {
@@ -29,7 +31,7 @@ export interface FirebaseAttachment {
     name: string;
     url: string;
     size: number;
-  }
+}
 
 export interface Note {
     id: string;
