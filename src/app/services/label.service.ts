@@ -45,6 +45,7 @@ export class LabelService {
   async updateAllLabels(userId: string, newLabels: Label[]) {
     const currentLabels = this.labelsSubject.getValue();
     const updatedLabels = this.dataSync.mergeAndUpdateLabels(currentLabels, newLabels);
+    this.labels = updatedLabels
     this.labelsSubject.next(updatedLabels);
     await this.offlineStorage.saveUserLabels(userId, updatedLabels);
   }

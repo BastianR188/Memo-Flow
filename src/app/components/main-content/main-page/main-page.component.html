@@ -1,8 +1,8 @@
-<div class="main">
+<div class="main" [ngClass]="{'dark-mode': darkMode}">
     <app-header-menu class="header"></app-header-menu>
     <app-side-menu class="side"></app-side-menu>
     <div class="content">
-        <app-notes-list *ngIf="!noteService.openTrash" style="width: 100%;"></app-notes-list>
-        <app-trash *ngIf="noteService.openTrash" style="width: 100%;"></app-trash>
+        <app-notes-list [ngClass]="{'dark-mode': darkMode}" *ngIf="!noteService.openTrash" style="width: 100%;"></app-notes-list>
+        <app-trash [ngClass]="{'dark-mode': darkMode}" *ngIf="noteService.openTrash" style="width: 100%;"></app-trash>
     </div>
 </div>

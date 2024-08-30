@@ -47,7 +47,7 @@ export class NoteService {
     const labelIds = this.labelService.labelsSubject.value.map(label => label.id);
     return { noteIds, labelIds };
   }
-  
+
 
   clearSearchTerm() {
     this.searchTermSubject.next('');
@@ -132,7 +132,7 @@ export class NoteService {
       .sort((a, b) => a.order - b.order);
     this.deletedNotes = notes.filter(note => note.delete);
   }
-  getAlId() {
+  getAlId(darkMode:boolean) {
     let noteIds: string[] = [];
     let labelIds: string[] = [];
 
@@ -147,7 +147,8 @@ export class NoteService {
     let data = {
       noteIds: noteIds,
       labelIds: labelIds,
-      userId: this.userId
+      userId: this.userId,
+      darkMode: darkMode
     };
 
     return data;
@@ -214,6 +215,7 @@ export class NoteService {
   }
 
   async updateOfflineAllNotes(userId: string, newNotes: Note[]) {
+    console.log('Dies ist der jetzige user: ' + userId)
     this.notesSubject.next(newNotes);
     await this.offlineStorage.saveUserNotes(userId, newNotes);
   }
@@ -221,10 +223,11 @@ export class NoteService {
   async updateAllNotes(userId: string, newNotes: Note[]) {
     const currentNotes = this.notesSubject.getValue();
     const updatedNotes = this.dataSync.mergeAndUpdateItems<Note>(currentNotes, newNotes);
+    this.notes = updatedNotes; // Aktualisieren Sie die notes Property
     this.notesSubject.next(updatedNotes);
     await this.offlineStorage.saveUserNotes(userId, updatedNotes);
   }
-
+  
   async addNote(note: Note): Promise<void> {
     if (!this.userId) throw new Error('User not set');
     this.clearSearchTerm()
@@ -233,15 +236,17 @@ export class NoteService {
     this.notesSubject.next([...this.notes]);
   }
 
-  async updateNote(updatedNote: Note): Promise<void> {
+  async updateNote(updatedNote: Note, pinn: boolean): Promise<void> {
     updatedNote.editAt = new Date();
     const updatedNotes = this.notes.map(note =>
       note.id === updatedNote.id ? { ...note, ...updatedNote } : note
     );
     this.notes = updatedNotes;
     await this.saveNotes(this.notes);
-    this.notesSubject.next(this.notes);
-    this.sortNotes(this.notes)
+    if (pinn) {
+      this.notesSubject.next(this.notes);
+      this.sortNotes(this.notes)
+    }
   }
 
   async deleteNote(id: string): Promise<void> {
@@ -262,14 +267,14 @@ export class NoteService {
   async moveToTrash(note: Note) {
     note.delete = true;
     note.editAt = new Date();
-    await this.updateNote(note);
+    await this.updateNote(note, false);
     this.loadNotes();
   }
 
   async restoreNoteFromTrash(note: Note) {
     note.delete = false;
     note.editAt = new Date();
-    await this.updateNote(note);
+    await this.updateNote(note, false);
     this.loadNotes();
   }
 }

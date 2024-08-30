@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { Label } from '../../../model/note';
 import { FirebaseService } from '../../../services/firebase.service';
 import { Subscription } from 'rxjs';
+import { SettingsService } from '../../../services/settings.service';
 
 @Component({
   selector: 'app-side-menu',
@@ -23,13 +24,19 @@ export class SideMenuComponent implements OnInit, OnDestroy {
   inputLabel: string = '';
   isEditLabel: number = -1;
   editInputName: string = '';
-  constructor(public noteService: NoteService, private router: Router, public firebaseService: FirebaseService, public label: LabelService) { }
+  darkMode: boolean = false;
+  private subscriptionDarkMode!: Subscription;
+  constructor(public noteService: NoteService, private router: Router, public firebaseService: FirebaseService, public label: LabelService, public settingsService: SettingsService) { }
   ngOnInit() {
+    this.subscriptionDarkMode = this.settingsService.darkMode$.subscribe(
+      darkMode => this.darkMode = darkMode
+    );
     this.subscription = this.label.getLabels().subscribe(
       labels => this.label._labels = labels
     );
   }
   ngOnDestroy() {
+    this.subscriptionDarkMode.unsubscribe();
     this.subscription.unsubscribe();
   }
   goToTrash() {

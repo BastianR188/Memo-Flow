@@ -1,44 +1,42 @@
-<div class="main">
+<div class="main" [ngClass]="{'dark-mode': darkMode}">
     <h1 class="title">{{title}}</h1>
 
     <div class="input-container">
-        <img style="left: 8px;" src=".\assets\icons\search.svg" alt="">
-        <input type="text" class="full-width" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange($event)">
-        <img *ngIf="searchTerm.length != 0" (click)="clearSearchTerm()" class="close" style="right: 8px;"
+        <img [ngClass]="{'invert-svg-icon': darkMode}" style="left: 8px;" src=".\assets\icons\search.svg" alt="">
+        <input type="text" class="full-width" [ngClass]="{'dark-mode-search': darkMode}" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange($event)">
+        <img *ngIf="searchTerm.length != 0" (click)="clearSearchTerm()" class="close" [ngClass]="{'invert-svg-icon': darkMode}" style="right: 8px;"
             src=".\assets\icons\close.svg" alt="">
     </div>
 
-    <div class="main">
+    <div class="main" [ngClass]="{'dark-mode': darkMode}">
         <div class="main-loading">
             <div (click)="loadFirebaseNotes()" class="btn-box" [ngClass]="{'disabled': firebaseService.isLoading}"
                 role="button" [attr.aria-disabled]="firebaseService.isLoading">
-                <img src=".\assets\icons\load.svg" alt="">
+                <img [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\load.svg" alt="">
                 <div>load from Cloud</div>
             </div>
-            <img class="loading" *ngIf="firebaseService.isLoading" src=".\assets\icons\loading.svg" alt="">
+            <img [ngClass]="{'invert-svg-icon': darkMode}" class="loading" *ngIf="firebaseService.isLoading" src=".\assets\icons\loading.svg" alt="">
         </div>
 
         <div class="main-loading">
             <div (click)="saveFirebaseNotes()" class="btn-box" [ngClass]="{'disabled': firebaseService.isLoading}"
                 role="button" [attr.aria-disabled]="firebaseService.isLoading">
-                <img src=".\assets\icons\save.svg" alt="">
+                <img [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\save.svg" alt="">
                 <div>Save in Cloud</div>
             </div>
-            <img class="loading" *ngIf="firebaseService.isLoading" src=".\assets\icons\loading.svg" alt="">
+            <img [ngClass]="{'invert-svg-icon': darkMode}" class="loading" *ngIf="firebaseService.isLoading" src=".\assets\icons\loading.svg" alt="">
         </div>
             <div class="btn-box" *ngIf="darkMode" (click)="toggleDarkMode()">
-                <img src=".\assets\icons\sun.svg" alt="">
+                <img [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\sun.svg" alt="">
                 <div>Helles Design</div>
             </div>
             <div class="btn-box" *ngIf="!darkMode" (click)="toggleDarkMode()">
-                <img src=".\assets\icons\moon.svg" alt="">
+                <img [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\moon.svg" alt="">
                 <div>Dunkles Design</div>
             </div>
         <div class="btn-box">
-            <img src=".\assets\icons\logout.svg" alt="">
+            <img [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\logout.svg" alt="">
             <div (click)="goToLogin()">Ausloggen</div>
         </div>
     </div>
-
-
 </div>

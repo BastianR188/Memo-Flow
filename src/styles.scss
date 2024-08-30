@@ -4,14 +4,32 @@ $base-color: rgba(0, 0, 0, 0.1);
 $hover-color: darken($base-color, 1%);
 $shadow-color: rgba(0, 0, 0, 0.2);
 $transition-time: 0.3s;
+
 body {
     transition: background-color 0.3s, color 0.3s;
-  }
-  
-  body.dark-mode {
+}
+
+body.dark-mode {
     background-color: #333;
     color: #fff;
-  }
+}
+input {
+    background-color: transparent;
+}
+.dark-mode-input {
+    color: #fff !important;
+}
+
+.dark-mode {
+    background-color: #333 !important;
+    color: #fff !important;
+
+    .invert-svg-icon {
+        filter: invert(1) hue-rotate(180deg) !important;
+    }
+}
+
+
 .cool-shadow-box {
     // Basis-Schatteneffekt
     // box-shadow:
@@ -55,7 +73,7 @@ body {
 }
 
 img {
-    border-radius: 8px;
+    border-radius: 16px;
 }
 
 .icon {
@@ -98,7 +116,7 @@ img {
     border: 1px solid #ccc;
     z-index: 1000;
     padding: 8px;
-    border-radius: 24px;
+    border-radius: 16px;
     gap: 4px;
     box-shadow:
         0 10px 20px $shadow-color,
@@ -153,5 +171,13 @@ img {
     transition: all 0.3s ease;
 
 }
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NotesListComponent } from '../notes-list/notes-list.component';
 import { SideMenuComponent } from '../side-menu/side-menu.component';
 import { ActivatedRoute } from '@angular/router';
@@ -6,7 +6,7 @@ import { NoteService } from '../../../services/note.service';
 import { TrashComponent } from "../trash/trash.component";
 import { CommonModule } from '@angular/common';
 import { LabelService } from '../../../services/label.service';
-import { Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { Subject, Subscription, switchMap, takeUntil, tap } from 'rxjs';
 import { HeaderMenuComponent } from '../header-menu/header-menu.component';
 import { SettingsService } from '../../../services/settings.service';
 
@@ -17,11 +17,14 @@ import { SettingsService } from '../../../services/settings.service';
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss'
 })
-export class MainPageComponent implements OnInit {
+export class MainPageComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+  darkMode: boolean = false;
+  private subscriptionDarkMode!: Subscription;
+
   constructor(
     private route: ActivatedRoute, public noteService: NoteService, private labelService: LabelService,
-    private settingsService: SettingsService) {
+    public settingsService: SettingsService) {
   }
   ngOnInit() {
     this.route.params.pipe(
@@ -34,6 +37,10 @@ export class MainPageComponent implements OnInit {
       this.loadNotes();
       this.loadLabels();
     });
+    this.subscriptionDarkMode = this.settingsService.darkMode$.subscribe(
+      darkMode => this.darkMode = darkMode
+    );
+
   }
   private initializeServices(userId: string) {
     return Promise.all([
@@ -56,5 +63,6 @@ export class MainPageComponent implements OnInit {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+    this.subscriptionDarkMode.unsubscribe();
   }
 }

@@ -1,9 +1,28 @@
-.trash-container{
+.trash-container {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
-.trash-button{
+
+.trash-button {
     max-width: 500px;
     cursor: pointer;
+}
+.btn-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 32px;
+    cursor: pointer;
+    transition: all 250ms ease;
+    padding: 8px 16px;
+    border-radius: 16px;
+    width: 140px;
+    border: 1px solid rgba($color: grey, $alpha: 0.2);
+    &:hover {
+        transform: scale(1.1);
+        background-color: rgba($color: grey, $alpha: 0.2);
+        border-color: transparent;
+
+    }
 }

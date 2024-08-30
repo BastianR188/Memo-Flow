@@ -1,33 +1,80 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { SettingsService } from './settings.service';
+import { Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ColorService {
+export class ColorService implements OnInit, OnDestroy {
   selectedColor: string = 'white'; // Standardfarbe, falls gewünscht
   isDropdownOpen: boolean = false;
-  constructor() { }
+  darkMode: boolean = false;
+  private subscriptionDarkMode!: Subscription;
 
-  private colors = [
+  constructor(private settingsService: SettingsService) { }
+  ngOnInit() {
+    this.subscriptionDarkMode = this.settingsService.darkMode$.subscribe(
+      darkMode => this.darkMode = darkMode
+    );
+  }
+  ngOnDestroy() {
+    this.subscriptionDarkMode.unsubscribe();
+  }
+  private lightColors = [
     { name: 'Weiß', value: '#ffffff' },
-    { name: 'Rot', value: '#ffcccb' },
-    { name: 'Grün', value: '#90ee90' },
-    { name: 'Blau', value: '#add8e6' },
-    { name: 'Gelb', value: '#ffffe0' },
-    { name: 'Orange', value: '#ffe4b5' }, // 1. Neue Farbe
-    { name: 'Lila', value: '#e6e6fa' },   // 2. Neue Farbe
-    { name: 'Rosa', value: '#ffb6c1' },   // 3. Neue Farbe
-    { name: 'Braun', value: '#d2b48c' },   // 4. Neue Farbe
-    { name: 'Grau', value: '#d3d3d3' },    // 5. Neue Farbe
-    { name: 'Türkis', value: '#40e0d0' },   // 6. Neue Farbe
-    { name: 'Beige', value: '#f5f5dc' },    // 7. Neue Farbe
-    { name: 'Olive', value: '#808000' },    // 8. Neue Farbe
-    { name: 'Indigo', value: '#4b0082' }    // 9. Neue Farbe
+    { name: 'Gebrochenes Weiß', value: '#f5f5f5' },
+    { name: 'Hellrot', value: '#ffcccb' },
+    { name: 'Hellgrün', value: '#90ee90' },
+    { name: 'Hellblau', value: '#add8e6' },
+    { name: 'Hellgelb', value: '#ffffe0' },
+    { name: 'Hellorange', value: '#ffe4b5' },
+    { name: 'Helllila', value: '#e6e6fa' },
+    { name: 'Hellrosa', value: '#ffb6c1' },
+    { name: 'Hellbraun', value: '#d2b48c' },
+    { name: 'Hellgrau', value: '#d3d3d3' },
+    { name: 'Helltürkis', value: '#afeeee' },
+    { name: 'Beige', value: '#f5f5dc' },
+    { name: 'Hellolive', value: '#9acd32' },
+    { name: 'Hellindigo', value: '#8a2be2' }
   ];
+  private darkColors = [
+    { name: 'Schwarz', value: '#333' },
+    { name: 'Schwarz', value: '#000000' },
+    { name: 'Dunkelrot', value: '#8b0000' },
+    { name: 'Dunkelgrün', value: '#006400' },
+    { name: 'Dunkelblau', value: '#00008b' },
+    { name: 'Dunkelgelb', value: '#ffd700' },
+    { name: 'Dunkelorange', value: '#ff8c00' },
+    { name: 'Dunkellila', value: '#4b0082' },
+    { name: 'Dunkelrosa', value: '#c71585' },
+    { name: 'Dunkelbraun', value: '#8b4513' },
+    { name: 'Dunkelgrau', value: '#696969' },
+    { name: 'Dunkeltürkis', value: '#008080' },
+    { name: 'Dunkelbeige', value: '#d2b48c' },
+    { name: 'Dunkelolive', value: '#556b2f' },
+    { name: 'Dunkelindigo', value: '#191970' }
+  ];
+  getColor(color: string, darkMode:boolean) {
+    const sourceColors = darkMode ? this.lightColors : this.darkColors;
+    const targetColors = darkMode ? this.darkColors : this.lightColors;
 
+    const index = sourceColors.findIndex(col => col.value === color);
+    if (index !== -1 && index < targetColors.length) {
+      return targetColors[index].value;
+    }
 
-  getColors() {
-    return this.colors;
+    // Wenn die Farbe nicht gefunden wurde, suche in der aktuellen Farbliste
+    const currentColors = darkMode ? this.darkColors : this.lightColors;
+    const newColor = currentColors.find(col => col.value === color);
+    if (newColor) {
+      return newColor.value
+    } 
+    return sourceColors[0].value
+  }
+
+  getColorPalette(darkMode: boolean) {
+    const colors = darkMode ? this.darkColors : this.lightColors;
+    return colors.slice(1);  // Gibt alle Farben außer der ersten zurück
   }
 
 }

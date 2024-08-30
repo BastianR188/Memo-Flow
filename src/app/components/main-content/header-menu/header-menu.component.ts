@@ -22,9 +22,10 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   private subscription!: Subscription;
   searchTerm: string = '';
   private searchSubscription!: Subscription;
+  private subscriptionDarkMode!: Subscription;
   constructor(private settingsService: SettingsService, private router: Router, private noteService: NoteService, public firebaseService: FirebaseService, private labelService: LabelService, private authService: AuthService) { }
   ngOnInit() {
-    this.subscription = this.settingsService.darkMode$.subscribe(
+    this.subscriptionDarkMode = this.settingsService.darkMode$.subscribe(
       darkMode => this.darkMode = darkMode
     );
     this.searchSubscription = this.noteService.searchTerm$.subscribe(term => {
@@ -43,6 +44,9 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     });
   }
   ngOnDestroy() {
+    if (this.subscriptionDarkMode){
+      this.subscriptionDarkMode.unsubscribe();
+    }
     this.authService.logout();
     if (this.subscription) {
       this.subscription.unsubscribe();
@@ -100,12 +104,15 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     if (data?.labels) {
       await this.labelService.updateAllLabels(this.noteService.userId, data.labels)
     }
+    if (data?.darkMode !== undefined) {
+      await this.settingsService.setDarkMode(data.darkMode);
+    }
     this.firebaseService.isLoading = false;
   }
 
   async saveFirebaseNotes() {
     this.firebaseService.isLoading = true;
-    await this.firebaseService.saveUserData(this.noteService.userId);
+    await this.firebaseService.saveUserData(this.noteService.userId, this.darkMode);
     this.firebaseService.isLoading = false;
   }
 }

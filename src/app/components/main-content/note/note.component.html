@@ -1,15 +1,17 @@
 <div class="overlay" *ngIf="isEditing" (click)="abortEditNote()"></div>
-<div [style.background-color]="note.color" class="note-main-container cool-shadow-box" [ngClass]="{
+<div [style.background-color]="checkColor(note.color)" class="note-main-container cool-shadow-box" [ngClass]="{
         'fullscreen': isFullscreen,
         'note-selected': isFullscreen,
     }">
     <div style="position: relative;">
         <div *ngIf="!note.delete" class="pinn-container">
             <span class="pinn">
-                <img *ngIf="note.isPinned" class="icon" style="background-color: rgba(255, 255, 255, 0.6);"
-                    (click)="togglePinNote()" src="assets/icons/pin-black.svg" alt="Pinned">
-                <img *ngIf="!note.isPinned" class="icon" style="background-color: rgba(128, 128, 128, 0.2);"
-                    (click)="togglePinNote()" src="assets/icons/pin-white.svg" alt="Not pinned">
+                <img *ngIf="note.isPinned" class="icon" [ngClass]="{'invert-svg-icon': darkMode}"
+                    style="background-color: rgba(255, 255, 255, 0.6);" (click)="togglePinNote()"
+                    src="assets/icons/pin-black.svg" alt="Pinned">
+                <img *ngIf="!note.isPinned" class="icon" [ngClass]="{'invert-svg-icon': darkMode}"
+                    style="background-color: rgba(128, 128, 128, 0.2);" (click)="togglePinNote()"
+                    src="assets/icons/pin-white.svg" alt="Not pinned">
             </span>
         </div>
     </div>
@@ -17,38 +19,46 @@
     <div [ngClass]="{'note-selected-content': isFullscreen}">
         <div [ngClass]="{'note-fullscreen': isFullscreen}">
             <div>
-                <div *ngIf="note.attachments.length > 0" (click)="editNote()">
+                <div *ngIf="note.attachments.length > 0" (click)="editNote(note.delete)">
                     <div *ngFor="let attachment of note.attachments; let i = index" class="main-attachment">
                         <img class="attachment" [src]="attachment.url" alt="Attachment">
-                        <img class="icon close" (click)="removeAttachment($event, attachment.id); saveNote()"
+                        <img *ngIf="!note.delete" class="icon close" [ngClass]="{'invert-svg-icon': darkMode}"
+                            (click)="removeAttachment($event, attachment.id); saveNote(false)"
                             src=".\assets\icons\close.svg" alt="">
                     </div>
                 </div>
 
                 <div *ngIf="isEditing">
                     <div class="text-container">
-                        <textarea [style.backgroundColor]="note.color" class="input-title" autosize type="text"
-                            [(ngModel)]="note.title" placeholder="Title" rows="1"></textarea>
+                        <textarea [style.backgroundColor]="note.color" class="input-title"
+                            [style.backgroundColor]="checkColor(note.color)" [ngClass]="{'dark-mode-input': darkMode}"
+                            autosize type="text" [(ngModel)]="note.title" placeholder="Title" rows="1"></textarea>
                         <textarea *ngIf="!note.isChecklist" [style.backgroundColor]="note.color" class="input-content"
+                            [style.backgroundColor]="checkColor(note.color)" [ngClass]="{'dark-mode-input': darkMode}"
                             autosize type="text" [(ngModel)]="note.content" placeholder="Note" rows="1"></textarea>
                     </div>
                     <div *ngIf="note.isChecklist">
-                        <div cdkDropList (cdkDropListDropped)="onDrop($event, false);saveNote()">
+                        <div cdkDropList (cdkDropListDropped)="onDrop($event, false);saveNote(false)">
                             <div *ngFor="let item of uncheckedItems; let i = index" cdkDrag
                                 class="text-ceckbox-container outerbox">
-                                <img class="drag-handle drag-icon" src=".\assets\icons\drag-handle.svg" alt="">
-                                <img *ngIf="!item.checked" (click)="onCheckboxChange($event, item.id);saveNote()"
-                                    class="icon" src=".\assets\icons\checkbox-unchecked.svg" alt="">
+                                <img class="drag-handle drag-icon" [ngClass]="{'invert-svg-icon': darkMode}"
+                                    src=".\assets\icons\drag-handle.svg" alt="">
+                                <img *ngIf="!item.checked" (click)="onCheckboxChange($event, item.id);saveNote(false)"
+                                    class="icon" [ngClass]="{'invert-svg-icon': darkMode}"
+                                    src=".\assets\icons\checkbox-unchecked.svg" alt="">
                                 <textarea #textArea [id]="'item-' + item.id" [style.backgroundColor]="note.color"
-                                    class="input-content textbox checklist-area-input" autosize type="text"
+                                    class="input-content textbox checklist-area-input"
+                                    [style.backgroundColor]="checkColor(note.color)"
+                                    [ngClass]="{'dark-mode-input': darkMode}" autosize type="text"
                                     [(ngModel)]="item.text" placeholder="Checklist Item" rows="1"></textarea>
-                                <div class="closebox" (click)="removeChecklistItem(item.id);saveNote()">
+                                <div class="closebox" (click)="removeChecklistItem(item.id);saveNote(false)">
                                     <img class="icon close" src=".\assets\icons\close.svg" alt="">
                                 </div>
                             </div>
                         </div>
-                        <div class="icon add-checklist" (click)="addChecklistItem();saveNote()">
-                            <img width="32px" height="32px" src=".\assets\icons\add-row.svg" alt="">Listeneintrag
+                        <div class="icon add-checklist" (click)="addChecklistItem();saveNote(false)">
+                            <img width="32px" height="32px" [ngClass]="{'invert-svg-icon': darkMode}"
+                                src=".\assets\icons\add-row.svg" alt="">Listeneintrag
                             hinzufügen
                         </div>
                         <div *ngIf="checkedItems.length > 0" class="completed-items">
@@ -60,17 +70,22 @@
                             }}
                         </div>
                         <div cdkDropList [hidden]="!isCompletedItemsVisible" class="completed-items-list"
-                            (cdkDropListDropped)="onDrop($event, true);saveNote()">
+                            (cdkDropListDropped)="onDrop($event, true);saveNote(false)">
                             <div *ngFor="let item of checkedItems; let i = index" cdkDrag
                                 class="text-ceckbox-container outerbox">
-                                <img class="drag-handle drag-icon" src=".\assets\icons\drag-handle.svg" alt="">
-                                <img *ngIf="item.checked" (click)="onCheckboxChange($event, item.id);saveNote()"
-                                    class="icon" src=".\assets\icons\checkbox-check.svg" alt="">
-                                <textarea #textArea [id]="'item-' + item.id" [style.backgroundColor]="note.color"
-                                    class="input-content textbox checklist-area-input completed" autosize type="text"
+                                <img class="drag-handle drag-icon" [ngClass]="{'invert-svg-icon': darkMode}"
+                                    src=".\assets\icons\drag-handle.svg" alt="">
+                                <img *ngIf="item.checked" (click)="onCheckboxChange($event, item.id);saveNote(false)"
+                                    class="icon" [ngClass]="{'invert-svg-icon': darkMode}"
+                                    src=".\assets\icons\checkbox-check.svg" alt="">
+                                <textarea [id]="'item-' + item.id" [style.backgroundColor]="note.color"
+                                    class="input-content textbox checklist-area-input completed"
+                                    [ngClass]="{'dark-mode-input': darkMode}"
+                                    [style.backgroundColor]="checkColor(note.color)" autosize type="text"
                                     [(ngModel)]="item.text" placeholder="Checklist Item" rows="1"></textarea>
-                                <div class="closebox" (click)="removeChecklistItem(item.id);saveNote()">
-                                    <img class="icon close" src=".\assets\icons\close.svg" alt="">
+                                <div class="closebox" (click)="removeChecklistItem(item.id);saveNote(false)">
+                                    <img class="icon close" [ngClass]="{'invert-svg-icon': darkMode}"
+                                        src=".\assets\icons\close.svg" alt="">
                                 </div>
                             </div>
                         </div>
@@ -79,51 +94,62 @@
 
                     </div>
                     <div class="label-box">
-                        <div *ngFor="let label of note.labels" class="label-item label-border label-width" style="margin-bottom: 20px;"
-                            (click)="selectLabel(label.id)">
+                        <div *ngFor="let label of note.labels" class="label-item label-border label-width"
+                            style="margin-bottom: 20px;" (click)="selectLabel(label.id)">
                             {{ label.name }}
                         </div>
                     </div>
                 </div>
             </div>
-            <div (click)="editNote()">
+            <div (click)="editNote(note.delete)">
                 <div *ngIf="!isEditing">
                     <div *ngIf="note.title.length !=0 || note.content.length !=0" class="text-container">
                         <h3 class="text" *ngIf="note.title.length !=0">{{ note.title }} </h3>
                         <p *ngIf="!note.isChecklist" class="text">{{ note.content }}</p>
                     </div>
                     <ng-container *ngIf="note.isChecklist">
-                        <div cdkDropList (cdkDropListDropped)="onDrop($event, false);saveNote()" [ngStyle]="{'margin-top': note.title.length === 0 ? '16px' : '0'}">
+                        <div cdkDropList (cdkDropListDropped)="!note.delete && onDrop($event, false); saveNote(false)"
+                            [cdkDropListDisabled]="note.delete"
+                            [ngStyle]="{'margin-top': note.title.length === 0 ? '16px' : '0'}">
                             <div *ngFor="let item of uncheckedItems; let i = index" cdkDrag
-                                class="text-ceckbox-container">
-                                <img class="drag-handle drag-icon" src=".\assets\icons\drag-handle.svg" alt="">
-                                <img *ngIf="!item.checked" (click)="onCheckboxChange($event, item.id);saveNote()"
-                                    class="icon" src=".\assets\icons\checkbox-unchecked.svg" alt="">
-                                <span class="text">{{ item.text }}</span>
-
+                                [cdkDragDisabled]="note.delete" class="text-ceckbox-container">
+                                <img class="drag-handle drag-icon"
+                                    [ngClass]="{'invert-svg-icon': darkMode, 'disabled': note.delete}"
+                                    src=".\assets\icons\drag-handle.svg" alt="">
+                                <img *ngIf="!item.checked"
+                                    (click)="!note.delete && onCheckboxChange($event, item.id); saveNote(false)"
+                                    class="icon" [ngClass]="{'invert-svg-icon': darkMode, 'disabled': note.delete}"
+                                    src=".\assets\icons\checkbox-unchecked.svg" alt="">
+                                <span class="text" [ngClass]="{'disabled-text': note.delete}">{{ item.text }}</span>
                             </div>
                         </div>
                         <div *ngIf="checkedItems.length > 0 && uncheckedItems.length > 0" class="stroke"></div>
-                        <div cdkDropList (cdkDropListDropped)="onDrop($event, true);saveNote()">
+                        <div cdkDropList (cdkDropListDropped)="!note.delete && onDrop($event, true); saveNote(false)"
+                            [cdkDropListDisabled]="note.delete">
                             <div *ngFor="let item of checkedItems; let i = index" cdkDrag
-                                class="text-ceckbox-container">
-                                <img class="drag-handle drag-icon" src=".\assets\icons\drag-handle.svg" alt="">
-                                <img *ngIf="item.checked" (click)="onCheckboxChange($event, item.id);saveNote()"
-                                    class="icon" src=".\assets\icons\checkbox-check.svg" alt="">
-                                <span class="completed">{{ item.text }}</span>
-
+                                [cdkDragDisabled]="note.delete" class="text-ceckbox-container">
+                                <img class="drag-handle drag-icon"
+                                    [ngClass]="{'invert-svg-icon': darkMode, 'disabled': note.delete}"
+                                    src=".\assets\icons\drag-handle.svg" alt="">
+                                <img *ngIf="item.checked"
+                                    (click)="!note.delete && onCheckboxChange($event, item.id); saveNote(false)"
+                                    class="icon" [ngClass]="{'invert-svg-icon': darkMode, 'disabled': note.delete}"
+                                    src=".\assets\icons\checkbox-check.svg" alt="">
+                                <span class="completed" [ngClass]="{'disabled-text': note.delete}">{{ item.text
+                                    }}</span>
                             </div>
                         </div>
                     </ng-container>
-              
+
+
+
                 </div>
 
             </div>
         </div>
-        <div class="label-box"  *ngIf="!isEditing">
+        <div class="label-box" *ngIf="!isEditing">
             <ng-container *ngIf="note.labels.length <= 4; else moreThanFour">
-                <div *ngFor="let label of note.labels" class="label-item label-border"
-                    (click)="selectLabel(label.id)">
+                <div *ngFor="let label of note.labels" class="label-item label-border" (click)="selectLabel(label.id)">
                     {{ label.name }}
                 </div>
             </ng-container>
@@ -139,51 +165,89 @@
 
         </div>
 
+        <div *ngIf="note.delete" class="footer-trash-note">
+            <div class="btn-box" (click)="noteService.deleteNotePermanently(note.id)">
+                <img style="    height: 32px;
+    width: 32px;" [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\trash-delete.svg" alt="">
+                <div>Endgültig Löschen</div>
+            </div>
+            <div class="btn-box" (click)="noteService.restoreNoteFromTrash(note)">
+                <img style="    height: 32px;
+    width: 32px;" [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\trash-restore.svg" alt="">
+                <div>Wiederherstellen</div>
+            </div>
+        </div>
+        <div class="date-footer-delete">
+            <div *ngIf="note.delete" class="date-stamp" [style.backgroundColor]="checkColor(note.color)"
+                [ngClass]="{'dark-mode-input': darkMode}">
+                <ng-container *ngIf="note.editAt == null; else edited">
+                    <div class="date-stamp-text">Erstellt am: </div>
+                    <div class="date-stamp-text">{{ note.createdAt | date:'d MMM y, HH:mm' }} Uhr</div>
+                </ng-container>
+                <ng-template #edited>
+                    <div class="date-stamp-text">Bearbeitet am:</div>
+                    <div class="date-stamp-text">{{ note.editAt | date:'d MMM y, HH:mm' }} Uhr</div>
+                </ng-template>
+            </div>
+        </div>
 
 
-
-        <div class="date-footer" [class.visible]="isFullscreen" [style.background-color]="note.color">
+        <div class="date-footer" *ngIf="!note.delete" [class.visible]="isFullscreen"
+            [style.background-color]="checkColor(note.color)">
             <div class="footer">
                 <div *ngIf="!note.delete" class="footer-note">
                     <div>
-                        <div class="color-selector" (click)="openDropdown('color')"
-                            (clickOutside)="this.isDropdownColorOpen = false;">
-                            <img class="icon" src="assets/icons/color-white.svg" alt="">
-                            <div class="dropdown-menu" *ngIf="isDropdownColorOpen">
-                                <div *ngFor="let color of colors" class="dropdown-item icon"
-                                    [style.backgroundColor]="color.value"
-                                    (click)="selectColor(color.value);onClickOutside('color');saveNote()">
+                        <div class="color-selector" (click)="openDropdown('color', note.delete)">
+                            <img class="icon" [ngClass]="{'invert-svg-icon': darkMode}"
+                                src="assets/icons/color-white.svg" alt="">
+                            <div class="dropdown-menu" [ngClass]="{'dark-mode': darkMode}" *ngIf="isDropdownColorOpen"
+                                (clickOutside)="this.isDropdownColorOpen = false;">
+                                <img class="dropdown-item icon"
+                                    (click)="selectColor('#ffffff');onClickOutside('color');saveNote(false)"
+                                    [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\no-color.svg" alt="">
+                                <div *ngFor="let color of colorService.getColorPalette(darkMode)"
+                                    class="dropdown-item icon" [style.backgroundColor]="color.value"
+                                    (click)="selectColor(color.value);onClickOutside('color');saveNote(false)">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div>
-                        <img class="icon" src="assets/icons/img-white.svg" alt="" (click)="fileInput.click()">
+                        <img class="icon" [ngClass]="{'invert-svg-icon': darkMode}" src="assets/icons/img-white.svg"
+                            alt="" (click)="fileInput.click()">
                         <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*"
                             style="display: none;">
                     </div>
-                    <div class="color-selector" (click)="openDropdown('menu')"
+                    <div class="color-selector" (click)="openDropdown('menu', note.delete)"
                         (clickOutside)="onClickOutside('menu'); onClickOutside('label')">
-                        <img class="icon" src=".\assets\icons\menu-vertical.svg" alt="">
-                        <div class="dropdown-menu footer-menu-drop" *ngIf="isDropdownMenuOpen">
-                            <div class="btn-menu" (click)="onClickOutside('menu'); openDropdown('label')">Label
+                        <img class="icon" [ngClass]="{'invert-svg-icon': darkMode}"
+                            src=".\assets\icons\menu-vertical.svg" alt="">
+                        <div class="dropdown-menu footer-menu-drop" [ngClass]="{'dark-mode': darkMode}"
+                            *ngIf="isDropdownMenuOpen">
+                            <div class="btn-menu" (click)="onClickOutside('menu'); openDropdown('label', note.delete)">
+                                Label
                                 hinzufügen</div>
-                            <div *ngIf="!isFullscreen" class="btn-menu" (click)="onClickOutside('menu'); editNote()">
+                            <div class="btn-menu" (click)="copieNote(note)">Kopie erstellen</div>
+                            <div *ngIf="!isFullscreen" class="btn-menu"
+                                (click)="onClickOutside('menu'); editNote(note.delete)">
                                 Bearbeiten</div>
                             <div class="btn-menu" (click)="deleteNote(); onClickOutside('menu')">Notiz Löschen</div>
                             <div class="stroke"></div>
                             <div (click)="onClickOutside('menu')" class="btn-menu">Schließen</div>
                         </div>
-                        <div class="dropdown-menu" *ngIf="isDropdownLabelOpen" (clickOutside)="onClickOutside('label')">
+                        <div class="dropdown-menu" [ngClass]="{'dark-mode': darkMode}" *ngIf="isDropdownLabelOpen"
+                            (clickOutside)="onClickOutside('label')">
                             <div class="footer-menu-drop">
 
                                 <div *ngFor="let label of labelService.labels" class="label-item label-btn-menu"
-                                    (click)="toggleLabel(label.id); saveNote()">
-                                    <img *ngIf="ifNoteInLabels(label.id)" class="icon"
+                                    (click)="toggleLabel(label.id)">
+                                    <img *ngIf="ifNoteInLabels(label.id)" style="    height: 32px;
+                                        width: 32px;" [ngClass]="{'invert-svg-icon': darkMode}"
                                         src=".\assets\icons\checkbox-check.svg" alt="">
-                                    <img *ngIf="!ifNoteInLabels(label.id)" class="icon"
+                                    <img *ngIf="!ifNoteInLabels(label.id)" style="    height: 32px;
+                                        width: 32px;" [ngClass]="{'invert-svg-icon': darkMode}"
                                         src=".\assets\icons\checkbox-unchecked.svg" alt="">
-                                    <div>{{label.name}}</div>
+                                    <div class="label-name">{{label.name}}</div>
                                 </div>
                                 <div class="stroke"></div>
                                 <div (click)="onClickOutside('label')" class="label-item">Schließen</div>
@@ -191,23 +255,18 @@
                         </div>
                     </div>
                 </div>
-                <div *ngIf="note.delete" class="footer-note">
-                    <button (click)="noteService.deleteNotePermanently(note.id)">Endgültig Löschen</button>
-                    <button (click)="noteService.restoreNoteFromTrash(note)">Wiederherstellen</button>
-                </div>
+
             </div>
-            <div class="date-stamp">
+
+            <div class="date-stamp" [style.backgroundColor]="checkColor(note.color)"
+                [ngClass]="{'dark-mode-input': darkMode}">
                 <ng-container *ngIf="note.editAt == null; else edited">
-                    <div>
-                        <div>Erstellt am: </div>
-                        <div>{{ note.createdAt | date:'d MMM y, HH:mm' }} Uhr</div>
-                    </div>
+                    <div class="date-stamp-text">Erstellt am: </div>
+                    <div class="date-stamp-text">{{ note.createdAt | date:'d MMM y, HH:mm' }} Uhr</div>
                 </ng-container>
                 <ng-template #edited>
-                    <div>
-                        <div>Bearbeitet am:</div>
-                        <div>{{ note.editAt | date:'d MMM y, HH:mm' }} Uhr</div>
-                    </div>
+                    <div class="date-stamp-text">Bearbeitet am:</div>
+                    <div class="date-stamp-text">{{ note.editAt | date:'d MMM y, HH:mm' }} Uhr</div>
                 </ng-template>
             </div>
         </div>

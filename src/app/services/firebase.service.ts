@@ -15,24 +15,14 @@ export class FirebaseService {
   isLoading: boolean = false;
   constructor(private noteService: NoteService,private labelService: LabelService) { }
 
-  async getData(col: string) {
-    const q = query(collection(this.firestore, col));
-    let dataList: any[] = [];
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      dataList.push(doc.data());
-    });
-    return dataList;
-  }
-
-  async saveUserData(id: string) {
+  async saveUserData(id: string, darkMode: boolean) {
     const userDocRef = doc(this.firestore, "userId", id);
     const notesCollectionRef = collection(this.firestore, "notes");
     const labelsCollectionRef = collection(this.firestore, "labels");
 
     try {
       // Benutzer-IDs speichern
-      let userData = this.noteService.getAlId();
+      let userData = this.noteService.getAlId(darkMode);
       await setDoc(userDocRef, userData);
 
       // Notes speichern
@@ -100,10 +90,14 @@ export class FirebaseService {
 
       // 3. Labels abrufen
       const labels: Label[] = await this.getLabelsByIds(userData.labelIds, "labels");
+
+      // 4. DarkMode abrufen
+      const darkMode: boolean = userData.darkMode || false;
       return {
         userData,
         notes,
-        labels
+        labels,
+        darkMode,
       };
 
     } catch (error) {

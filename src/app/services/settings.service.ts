@@ -13,7 +13,7 @@ export class SettingsService {
 
   private userId: string | null = null;
 
-  constructor(private offlineStorage: OfflineStorageService, private noteService: NoteService) {}
+  constructor(private offlineStorage: OfflineStorageService, private noteService: NoteService) { }
 
   setUserId(userId: string) {
     this.userId = userId;
@@ -27,8 +27,20 @@ export class SettingsService {
     }
   }
 
-  async toggleDarkMode() {
+  async setDarkMode(darkMode: boolean) {
+    this.darkModeSubject.next(darkMode);
+    // Optional: Speichern Sie die Einstellung auch lokal oder in Firebase
+    if (this.userId) {
+      await this.updateDarkMode(darkMode);
+    }
+  }
+
+  toggleDarkMode() {
     const newDarkMode = !this.darkModeSubject.value;
+    this.updateDarkMode(newDarkMode)
+  }
+
+  async updateDarkMode(newDarkMode: boolean) {
     if (this.userId) {
       const { noteIds, labelIds } = this.noteService.getNoteAndLabelIds();
       const settings: Omit<userData, 'userId'> = {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, QueryList, ViewChildren, OnDestroy } from '@angular/core';
 import { NoteService } from '../../../services/note.service';
 import { AttachmentService } from '../../../services/attachment.service';
 import { ChecklistService } from '../../../services/checklist.service';
@@ -11,7 +11,8 @@ import { AutosizeModule } from 'ngx-autosize';
 import { LabelService } from '../../../services/label.service';
 import { ClickOutsideDirective } from '../../../services/click-outside.directive';
 import { CdkDragDrop, CdkDragPreview, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+import { SettingsService } from '../../../services/settings.service';
 
 @Component({
   selector: 'app-notes-list',
@@ -20,7 +21,7 @@ import { Observable } from 'rxjs';
   templateUrl: './notes-list.component.html',
   styleUrls: ['./notes-list.component.scss']
 })
-export class NotesListComponent implements OnInit {
+export class NotesListComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @ViewChildren('textArea') textAreas!: QueryList<ElementRef>;
   selectedColor: string = '#ffffff'; // Standardfarbe, falls gewünscht
@@ -38,18 +39,31 @@ export class NotesListComponent implements OnInit {
   colors: { name: string, value: string }[] = []; // Array für die Farben
   pinnedNotes$!: Observable<Note[]>;
   unpinnedNotes$!: Observable<Note[]>;
+  darkMode: boolean = false;
+  private subscriptionDarkMode!: Subscription;
+
   constructor(
     public noteService: NoteService,
     private attachmentService: AttachmentService,
     private checklistService: ChecklistService,
-    private colorService: ColorService,
-    public labelService: LabelService
+    public colorService: ColorService,
+    public labelService: LabelService,
+    public settingsService: SettingsService
   ) { }
 
   ngOnInit() {
-    this.colors = this.colorService.getColors();
+    if (!this.selectedColor) {
+      this.selectedColor = this.colorService.getColor(this.selectedColor, this.darkMode); // oder eine andere Standardfarbe
+    }
       this.pinnedNotes$ = this.noteService.filteredPinnedNotes$;
       this.unpinnedNotes$ = this.noteService.filteredUnpinnedNotes$;
+      this.subscriptionDarkMode = this.settingsService.darkMode$.subscribe(
+        darkMode => this.darkMode = darkMode
+      );
+  }
+  ngOnDestroy() {
+    this.subscriptionDarkMode.unsubscribe();
+
   }
   drop(event: CdkDragDrop<Note[]>, isPinned:boolean) {
     const itemList = isPinned ? this.noteService.pinnedNotes : this.noteService.unpinnedNotes;
@@ -133,6 +147,9 @@ export class NotesListComponent implements OnInit {
   selectColor(color: string) {
     this.selectedColor = color;
     this.isDropdownColorOpen = false;
+  }
+  checkColor() {
+      return this.colorService.getColor(this.selectedColor, this.darkMode);
   }
 
   resetForm() {

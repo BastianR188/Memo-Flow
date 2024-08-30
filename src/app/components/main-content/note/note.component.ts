@@ -12,6 +12,7 @@ import { ChecklistService } from '../../../services/checklist.service';
 import { AutosizeModule } from 'ngx-autosize';
 import { LabelService } from '../../../services/label.service';
 import { Subscription } from 'rxjs';
+import { SettingsService } from '../../../services/settings.service';
 @Component({
   selector: 'app-note',
   standalone: true,
@@ -25,7 +26,6 @@ export class NoteComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   private labelSubscription!: Subscription;
   isFullscreen: boolean = false;
-  selectedColor: string = 'white'; // Standardfarbe, falls gewünscht
   isDropdownColorOpen: boolean = false;
   isDropdownMenuOpen: boolean = false;
   isDropdownLabelOpen: boolean = false;
@@ -33,26 +33,76 @@ export class NoteComponent implements OnInit, OnDestroy {
   isEditing: boolean = false;
   attachments: ImageAttachment[] = [];
   colors: { name: string, value: string }[] = []; // Array für die Farben
+  darkMode: boolean = false;
+  private subscriptionDarkMode!: Subscription;
 
   constructor(
     public noteService: NoteService,
     private attachmentService: AttachmentService,
-    private colorService: ColorService,
+    public colorService: ColorService,
     private checklistService: ChecklistService,
-    public labelService: LabelService
+    public labelService: LabelService,
+    public settingsService: SettingsService
   ) { }
 
   ngOnInit() {
-    this.colors = this.colorService.getColors(); // Lade die Farben
+    this.subscriptionDarkMode = this.settingsService.darkMode$.subscribe(
+      darkMode => this.darkMode = darkMode
+    );
     this.sortOrder();
   }
 
   ngOnDestroy() {
+    this.subscriptionDarkMode.unsubscribe();
     if (this.labelSubscription) {
       this.labelSubscription.unsubscribe();
     }
   }
+  newNote() {
+    const newNote: Note = {
+      id: this.noteService.newId(),
+      title: this.note.title,
+      content: this.note.isChecklist ? '' : this.note.content,
+      isChecklist: this.note.isChecklist,
+      checklistItems: this.note.isChecklist ? this.note.checklistItems : [],
+      color: this.note.color,
+      isPinned: this.note.isPinned,
+      attachments: this.attachments,
+      createdAt: new Date(),
+      editAt: null,
+      delete: false,
+      labels: this.note.labels,
+      order: 0, // Setze immer auf 0 für neue Notizen
+      // ... andere Eigenschaften
+    };
 
+    // Verschiebe alle anderen Notizen um eine Position nach unten
+    this.shiftNotesOrder(newNote.isPinned);
+
+    // Füge die neue Notiz hinzu
+    if (newNote.isPinned) {
+      this.noteService.pinnedNotes.unshift(newNote);
+    } else {
+      this.noteService.unpinnedNotes.unshift(newNote);
+    }
+
+    // Aktualisiere alle Notizen
+    this.noteService.updateOfflineAllNotes(this.noteService.userId, [...this.noteService.pinnedNotes, ...this.noteService.unpinnedNotes]);
+
+    return newNote;
+  }
+  private shiftNotesOrder(isPinned: boolean) {
+    const notesToShift = isPinned ? this.noteService.pinnedNotes : this.noteService.unpinnedNotes;
+    notesToShift.forEach(note => {
+      note.order += 1;
+    });
+  }
+  copieNote(note: Note) {
+    this.noteService.addNote(this.newNote());
+  }
+  checkColor(noteColor: string) {
+    return this.colorService.getColor(noteColor, this.darkMode);
+  }
   validateAndCleanLabels() {
     const validLabels = new Map(this.labelService.labels.map(label => [label.id, label]));
 
@@ -91,13 +141,15 @@ export class NoteComponent implements OnInit, OnDestroy {
     this.noteService.setSelectedLabel(id);
   }
 
-  openDropdown(dropdownId: string) {
-    if (dropdownId === 'color') {
-      this.isDropdownColorOpen = true;
-    } else if (dropdownId === 'label') {
-      this.isDropdownLabelOpen = true;
-    } else if (dropdownId === 'menu' && this.isDropdownLabelOpen == false) {
-      this.isDropdownMenuOpen = true;
+  openDropdown(dropdownId: string, trash: boolean) {
+    if (!trash) {
+      if (dropdownId === 'color') {
+        this.isDropdownColorOpen = true;
+      } else if (dropdownId === 'label') {
+        this.isDropdownLabelOpen = true;
+      } else if (dropdownId === 'menu' && this.isDropdownLabelOpen == false) {
+        this.isDropdownMenuOpen = true;
+      }
     }
   }
 
@@ -155,16 +207,18 @@ export class NoteComponent implements OnInit, OnDestroy {
 
   togglePinNote() {
     this.note.isPinned = !this.note.isPinned;
-    this.saveNote();
+    this.saveNote(true);
   }
 
   toggleCompletedItems() {
     this.isCompletedItemsVisible = !this.isCompletedItemsVisible;
   }
 
-  editNote() {
-    this.isEditing = true;
-    this.isFullscreen = true;
+  editNote(trash: boolean) {
+    if (!trash) {
+      this.isEditing = true;
+      this.isFullscreen = true;
+    }
   }
 
   abortEditNote() {
@@ -174,9 +228,8 @@ export class NoteComponent implements OnInit, OnDestroy {
 
   }
 
-  async saveNote() {
-    await this.noteService.updateNote(this.note);
-    // this.pinStatusChanged.emit();
+  async saveNote(refresh: boolean) {
+    await this.noteService.updateNote(this.note, refresh);
   }
 
   async onFileSelected(event: Event) {
@@ -184,7 +237,7 @@ export class NoteComponent implements OnInit, OnDestroy {
     let fileList: FileList | null = element.files;
     if (fileList) {
       await this.attachmentService.addAttachmentsToNote(this.note, fileList);
-      this.saveNote();
+      this.saveNote(false);
       if (this.fileInput) {
         this.fileInput.nativeElement.value = '';
       }
@@ -252,5 +305,6 @@ export class NoteComponent implements OnInit, OnDestroy {
         }
       }
     }
+    this.saveNote(false);
   }
 }

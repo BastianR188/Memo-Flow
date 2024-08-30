@@ -62,7 +62,7 @@
     .input-container {
         border: solid 1px;
         margin: 8px;
-        border-radius: 24px;
+        border-radius: 16px;
         width: 80%;
         max-width: 1024px;
         display: flex;
@@ -103,7 +103,9 @@
     padding: 8px 32px;
     align-items: center;
 }
-
+.label-name{
+    padding: 0 8px;
+}
 .label-border {
     width: 38px;
     border-radius: 16px;

@@ -8,13 +8,16 @@ div[role="button"].disabled {
     cursor: not-allowed;
     /* Andere Stile für den deaktivierten Zustand */
 }
-
+.dark-mode-search{
+    color: #ffff;
+}
 .main {
     display: flex;
     justify-content: space-between;
     padding: 0 16px;
     height: 100%;
     background-color: #ffff;
+    color: black;
 }
 
 input {

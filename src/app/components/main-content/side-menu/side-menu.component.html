@@ -1,35 +1,36 @@
-<div class="main">
+<div class="main"  [ngClass]="{'dark-mode': darkMode}">
     <div class="btn-box" [ngClass]="{'selected-label': !noteService.openTrash && noteService.selectedLabel === ''}">
-        <img src=".\assets\icons\note.svg" alt="">
+        <img [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\note.svg" alt="">
         <div (click)="goToNote()" >Notizen</div>
     </div>
 
     <div class="color-selector" (click)="openDropdown('addLabel')"
         (clickOutside)="onClickOutside('addLabel'); isEditLabel = -1; inputLabel = ''">
         <div class="btn-box">
-            <img src=".\assets\icons\edit.svg" alt="">
+            <img [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\edit.svg" alt="">
             <div>Labels bearbeiten</div>
         </div>
-        <div class="dropdown-menu label-dropmenu" *ngIf="addLabelDropdown">
+        <div class="dropdown-menu label-dropmenu" [ngClass]="{'dark-mode': darkMode}" *ngIf="addLabelDropdown">
             <div>
                 <div>Neues Label erstellen</div>
                 <div class="dropdown-container close-hover">
-                    <img (click)="abortNewLabel()" class="icon close" src=".\assets\icons\close.svg" alt="">
-                    <input class="label-name" type="text" [(ngModel)]="inputLabel">
-                    <img *ngIf="inputLabel.length != 0" (click)="addNewLabel()" class="icon"
+                    <img (click)="abortNewLabel()" class="icon close" [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\close.svg" alt="">
+                    <input class="label-name width-label" #labelInput type="text" [ngClass]="{'dark-mode-input': darkMode}" [(ngModel)]="inputLabel">
+                    <img *ngIf="inputLabel.length == 0" class="icon close" autofocus="labelInput" [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\edit.svg" alt="">
+                    <img *ngIf="inputLabel.length != 0" (click)="addNewLabel()" class="icon" [ngClass]="{'invert-svg-icon': darkMode}"
                         src=".\assets\icons\check.svg" alt="">
                 </div>
             </div>
             <div class="stroke"></div>
             <div *ngFor="let label of this.label.labels; let i = index" class="dropdown-container close-hover">
-                <img (click)="removeLabel(label)" class="icon close" src=".\assets\icons\close.svg" alt="">
-                <div *ngIf="isEditLabel == i" class="label-item">
+                <img (click)="removeLabel(label)" class="icon close" [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\close.svg" alt="">
+                <div *ngIf="isEditLabel == i" class="label-item  width-label">
                     <input class="label-name" [(ngModel)]="editInputName" type="text" name="" id="">
-                    <img (click)="setLabel(label, i)" class="icon" src=".\assets\icons\check.svg" alt="">
+                    <img (click)="setLabel(label, i)" class="icon" [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\check.svg" alt="">
                 </div>
-                <div *ngIf="isEditLabel != i" class="label-item">
+                <div *ngIf="isEditLabel != i" class="label-item  width-label">
                     <div class="label-name">{{label.name}}</div>
-                    <img (click)="editLabel(label, i)" class="icon" src=".\assets\icons\edit.svg" alt="">
+                    <img (click)="editLabel(label, i)" class="icon" [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\edit.svg" alt="">
                 </div>
             </div>
         </div>
@@ -38,7 +39,7 @@
         <div *ngFor="let label of this.label.labels" class="label-item label btn-box" (click)="selectLabel(label.id)"
             [ngClass]="{'selected-label': label.id === noteService.selectedLabel}">
             <div class="label-item label " [ngClass]="{'transform-label': label.id === noteService.selectedLabel}">
-                <img class="icon label-icon" 
+                <img class="icon label-icon" [ngClass]="{'invert-svg-icon': darkMode}" 
                     src=".\assets\icons\label.svg" alt="">
                 <div class="text-ellipsis label-icon"
                     >{{label.name}}</div>
@@ -46,7 +47,7 @@
         </div>
     </div>
     <div class="btn-box" [ngClass]="{'selected-label': noteService.openTrash}">
-        <img src=".\assets\icons\trash.svg" alt="">
+        <img [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\trash.svg" alt="">
         <div (click)="goToTrash()">Papierkorb </div>
     </div>
 </div>

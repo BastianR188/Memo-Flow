@@ -1,20 +1,22 @@
 <div class="main-input-container">
-    <div class="input-container" [style.backgroundColor]="selectedColor">
+    <div class="input-container" [style.backgroundColor]="checkColor()">
         <div class="input-box">
             <div class="input-line title-box">
-                <textarea [style.backgroundColor]="selectedColor" class="input-title" autosize type="text"
-                    [(ngModel)]="title" placeholder="Title" rows="1"></textarea>
+                <textarea [style.backgroundColor]="checkColor()" [ngClass]="{'dark-mode-input': darkMode}"
+                    class="input-title" autosize type="text" [(ngModel)]="title" placeholder="Title"
+                    rows="1"></textarea>
                 <span class="pinn">
-                    <img *ngIf="isPinned" class="icon" (click)="isPinned = false" src="assets/icons/pin-black.svg"
-                        alt="Pinned">
-                    <img *ngIf="!isPinned" class="icon" (click)="isPinned = true" src="assets/icons/pin-white.svg"
-                        alt="Not pinned">
+                    <img *ngIf="isPinned" class="icon" [ngClass]="{'invert-svg-icon': darkMode}"
+                        (click)="isPinned = false" src="assets/icons/pin-black.svg" alt="Pinned">
+                    <img *ngIf="!isPinned" class="icon" [ngClass]="{'invert-svg-icon': darkMode}"
+                        (click)="isPinned = true" src="assets/icons/pin-white.svg" alt="Not pinned">
                 </span>
             </div>
             <div class="input-content-container">
                 <div *ngIf="!isChecklist" class="input-line title-box">
-                    <textarea [style.backgroundColor]="selectedColor" class="input-content" autosize type="text"
-                        [(ngModel)]="note" placeholder="Note" rows="1"></textarea>
+                    <textarea [style.backgroundColor]="checkColor()" class="input-content"
+                        [ngClass]="{'dark-mode-input': darkMode}" autosize type="text" [(ngModel)]="note"
+                        placeholder="Note" rows="1"></textarea>
 
                 </div>
                 <div *ngIf="isChecklist">
@@ -22,18 +24,21 @@
                         <div class="input-line outerbox checklist-area-border">
                             <img [src]="item.checked ? './assets/icons/checkbox-check.svg' : './assets/icons/checkbox-unchecked.svg'"
                                 (click)="checklistItems[i].checked = !checklistItems[i].checked" class="icon checkbox"
+                                [ngClass]="{'invert-svg-icon': darkMode}"
                                 [alt]="item.checked ? 'Checked' : 'Unchecked'">
-                            <textarea #textArea [id]="'item-' + item.id" [style.backgroundColor]="selectedColor"
-                                class="input-content textbox checklist-area-input" autosize type="text"
+                            <textarea #textArea [id]="'item-' + item.id" [style.backgroundColor]="checkColor()"
+                                class="input-content textbox checklist-area-input"
+                                [ngClass]="{'dark-mode-input': darkMode}" autosize type="text"
                                 [(ngModel)]="checklistItems[i].text" placeholder="Checklist Item" rows="1"></textarea>
                             <div class="closebox">
                                 <img class="icon close" (click)="removeChecklistItem(item.id)"
-                                    src=".\assets\icons\close.svg" alt="">
+                                    [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\close.svg" alt="">
                             </div>
                         </div>
                     </div>
                     <div class="icon add-checklist" (click)="addChecklistItem()">
-                        <img width="32px" height="32px" src=".\assets\icons\add-row.svg" alt="">Listeneintrag
+                        <img width="32px" height="32px" [ngClass]="{'invert-svg-icon': darkMode}"
+                            src=".\assets\icons\add-row.svg" alt="">Listeneintrag
                         hinzufügen
                     </div>
 
@@ -54,9 +59,13 @@
                 <div class="icon"></div>
 
                 <div class="color-selector" (click)="openDropdown('color')">
-                    <img class="icon" src="assets/icons/color-white.svg" alt="">
-                    <div class="dropdown-menu" *ngIf="isDropdownColorOpen" (clickOutside)="onClickOutside('color')">
-                        <div *ngFor="let color of colors" class="dropdown-item icon"
+                    <img class="icon" [ngClass]="{'invert-svg-icon': darkMode}" src="assets/icons/color-white.svg"
+                        alt="">
+                    <div class="dropdown-menu" [ngClass]="{'dark-mode': darkMode}" *ngIf="isDropdownColorOpen"
+                        (clickOutside)="onClickOutside('color')">
+                        <img class="dropdown-item icon" (click)="selectColor('#ffffff');onClickOutside('color')"
+                            [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\no-color.svg" alt="">
+                        <div *ngFor="let color of colorService.getColorPalette(darkMode)" class="dropdown-item icon"
                             [style.backgroundColor]="color.value"
                             (click)="selectColor(color.value);onClickOutside('color')">
                         </div>
@@ -64,23 +73,25 @@
                 </div>
 
                 <div>
-                    <img class="icon" src="assets/icons/img-white.svg" alt="" (click)="fileInput.click()">
+                    <img class="icon" [ngClass]="{'invert-svg-icon': darkMode}" src="assets/icons/img-white.svg" alt=""
+                        (click)="fileInput.click()">
                     <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*"
                         style="display: none;">
                 </div>
 
                 <div style="position: relative;">
-                    <img class="icon" (click)="onClickOutside('menu'); openDropdown('label')"
-                        src=".\assets\icons\label.svg" alt="">
-                    <div class="dropdown-menu" *ngIf="isDropdownLabelOpen" (clickOutside)="onClickOutside('label')">
-                        <div class="footer-menu-drop">
+                    <img class="icon" [ngClass]="{'invert-svg-icon': darkMode}"
+                        (click)="onClickOutside('menu'); openDropdown('label')" src=".\assets\icons\label.svg" alt="">
+                    <div class="dropdown-menu" [ngClass]="{'dark-mode': darkMode}" *ngIf="isDropdownLabelOpen"
+                        (clickOutside)="onClickOutside('label')">
+                        <div class="footer-menu-drop" [ngClass]="{'dark-mode': darkMode}">
                             <div *ngFor="let label of labelService.labels" class="label-item label-btn-menu"
                                 (click)="toggleLabel(label.id)">
-                                <img *ngIf="ifNoteInLabels(label.id)" class="icon"
-                                    src=".\assets\icons\checkbox-check.svg" alt="">
-                                <img *ngIf="!ifNoteInLabels(label.id)" class="icon"
-                                    src=".\assets\icons\checkbox-unchecked.svg" alt="">
-                                <div>{{label.name}}</div>
+                                <img *ngIf="ifNoteInLabels(label.id)" style="    height: 32px;
+                                    width: 32px;" [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\checkbox-check.svg" alt="">
+                                <img *ngIf="!ifNoteInLabels(label.id)" style="    height: 32px;
+                                    width: 32px;" [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\checkbox-unchecked.svg" alt="">
+                                <div class="label-name">{{label.name}}</div>
                             </div>
                             <div class="stroke"></div>
                             <div (click)="onClickOutside('label')" class="label-item">Schließen</div>
@@ -91,10 +102,12 @@
             </div>
             <div class="footer-menu-container">
                 <span class="pinn">
-                    <img *ngIf="isChecklist" class="icon" (click)="isChecklist = false; deleteChecklistItems()"
-                        src=".\assets\icons\checkbox-black.svg" alt="Pinned">
-                    <img *ngIf="!isChecklist" class="icon" (click)="isChecklist = true; isChecklistItem()"
-                        src=".\assets\icons\checkbox-outline.svg" alt="Not pinned">
+                    <img *ngIf="isChecklist" class="icon" [ngClass]="{'invert-svg-icon': darkMode}"
+                        (click)="isChecklist = false; deleteChecklistItems()" src=".\assets\icons\checkbox-black.svg"
+                        alt="Pinned">
+                    <img *ngIf="!isChecklist" class="icon" [ngClass]="{'invert-svg-icon': darkMode}"
+                        (click)="isChecklist = true; isChecklistItem()" src=".\assets\icons\checkbox-outline.svg"
+                        alt="Not pinned">
                 </span>
                 <div class="icon" (click)="createNote()"><strong>Erstellen</strong></div>
                 <div class="icon"></div>
@@ -103,17 +116,20 @@
     </div>
 </div>
 
-<div class="main-note-board">
+<div class="main-note-board" [ngClass]="{'dark-mode': darkMode}">
+    <div *ngIf="noteService.pinnedNotes.length != 0">Angepinnte Notizen</div>
     <div *ngIf="noteService.pinnedNotes.length != 0" style="width: 100%;">
-        <h2>Angepinnte Notizen</h2>
         <div class="note-board" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="drop($event, true)">
             <div *ngFor="let note of pinnedNotes$ | async" cdkDrag>
                 <app-note class="drag-div" [note]="note"></app-note>
             </div>
         </div>
     </div>
+    <div *ngIf="noteService.pinnedNotes.length != 0 && noteService.unpinnedNotes.length !=0">Nicht angepinnte Notizen
+    </div>
+    <div class="note-board" style="width: 100%;" cdkDropList cdkDropListOrientation="mixed"
+        (cdkDropListDropped)="drop($event, false)">
 
-    <div class="note-board" style="width: 100%;" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="drop($event, false)">
         <div *ngFor="let note of unpinnedNotes$ | async" cdkDrag>
             <app-note class="drag-div" [note]="note"></app-note>
         </div>

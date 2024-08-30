@@ -1,10 +1,19 @@
 <div class="trash-container">
-    <button (click)="deleteAllNotes()" class="trash-button">Papierkorb leeren</button>
-    <div class="main-note-board">
-        <div class="note-board">
-            <div *ngFor="let note of noteService.deletedNotes">
-                <app-note [note]="note"></app-note>
+    <div *ngIf="noteService.deletedNotes.length == 0">Keine Notizen im Papierkorb</div>
+    <div *ngIf="noteService.deletedNotes.length != 0" class="trash-container">
+        <div class="btn-box" (click)="deleteAllNotes()">Papierkorb leeren</div>
+        <div class="main-note-board">
+            <div class="note-board">
+                <div *ngFor="let note of noteService.deletedNotes">
+                    <app-note [note]="note"></app-note>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+
+<!-- <div class="btn-box" *ngIf="!darkMode" (click)="toggleDarkMode()">
+    <img [ngClass]="{'invert-svg-icon': darkMode}" src=".\assets\icons\moon.svg" alt="">
+    <div>Dunkles Design</div>
+</div> -->
