@@ -7,7 +7,7 @@ import { ImageAttachment, Note } from '../model/note';
 export class AttachmentService {
   
   constructor() { }
-  private generateUniqueId(): string {
+  generateUniqueId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
   }
 

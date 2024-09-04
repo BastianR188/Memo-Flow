@@ -67,7 +67,10 @@ export class NoteComponent implements OnInit, OnDestroy {
       checklistItems: this.note.isChecklist ? this.note.checklistItems : [],
       color: this.note.color,
       isPinned: this.note.isPinned,
-      attachments: this.attachments,
+      attachments: this.note.attachments.map(attachment => ({
+        ...attachment,
+        id: this.attachmentService.generateUniqueId()
+      })),
       createdAt: new Date(),
       editAt: null,
       delete: false,
@@ -257,7 +260,6 @@ export class NoteComponent implements OnInit, OnDestroy {
   }
 
   deleteNote() {
-    this.note.editAt = new Date();
     this.noteService.moveToTrash(this.note);
   }
 

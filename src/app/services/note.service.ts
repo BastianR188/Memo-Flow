@@ -229,6 +229,7 @@ export class NoteService {
   }
   
   async addNote(note: Note): Promise<void> {
+    console.log('Dieser Note wird erstellt', note)
     if (!this.userId) throw new Error('User not set');
     this.clearSearchTerm()
     this.notes.push(note);
