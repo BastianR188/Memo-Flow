@@ -238,7 +238,7 @@
                         <div class="dropdown-menu" [ngClass]="{'dark-mode': darkMode}" *ngIf="isDropdownLabelOpen"
                             (clickOutside)="onClickOutside('label')">
                             <div class="footer-menu-drop">
-
+                                <div *ngIf="labelService.labels.length == 0">Keine Labels vorhanden!</div>
                                 <div *ngFor="let label of labelService.labels" class="label-item label-btn-menu"
                                     (click)="toggleLabel(label.id)">
                                     <img *ngIf="ifNoteInLabels(label.id)" style="    height: 32px;

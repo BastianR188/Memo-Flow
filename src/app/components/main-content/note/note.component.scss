@@ -60,6 +60,9 @@
 }
 .label-name{
     padding: 0 8px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 200px;
 }
 .completed-items-list[hidden] {
     max-height: 0;
@@ -313,7 +316,7 @@ ul {
 .footer-menu-drop {
     flex-direction: column;
     padding: 16px;
-    width: 140px;
+    width: 240px;
     white-space: nowrap;
     overflow-wrap: normal;
     word-wrap: normal;
