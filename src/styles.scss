@@ -8,7 +8,9 @@ $transition-time: 0.3s;
 body {
     transition: background-color 0.3s, color 0.3s;
 }
-
+.min-height {
+    height: calc(100vh - 64px);
+}
 body.dark-mode {
     background-color: #333;
     color: #fff;

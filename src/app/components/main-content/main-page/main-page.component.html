@@ -2,7 +2,7 @@
     <app-header-menu class="header"></app-header-menu>
     <app-side-menu class="side"></app-side-menu>
     <div class="content">
-        <app-notes-list [ngClass]="{'dark-mode': darkMode}" *ngIf="!noteService.openTrash" style="width: 100%;"></app-notes-list>
-        <app-trash [ngClass]="{'dark-mode': darkMode}" *ngIf="noteService.openTrash" style="width: 100%;"></app-trash>
+        <app-notes-list [ngClass]="{'dark-mode': darkMode}" *ngIf="!noteService.openTrash" style="width: 100%; min-height: calc(100vh - 64px);"></app-notes-list>
+        <app-trash [ngClass]="{'dark-mode': darkMode}" *ngIf="noteService.openTrash" style="width: 100%; min-height: calc(100vh - 64px);"></app-trash>
     </div>
 </div>
