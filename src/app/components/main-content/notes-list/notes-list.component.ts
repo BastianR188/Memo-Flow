@@ -7,18 +7,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NoteComponent } from '../note/note.component';
 import { ColorService } from '../../../services/color.service';
-import { AutosizeModule } from 'ngx-autosize';
 import { LabelService } from '../../../services/label.service';
 import { ClickOutsideDirective } from '../../../services/click-outside.directive';
 import { CdkDragDrop, CdkDragPreview, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Observable, Subscription } from 'rxjs';
 import { SettingsService } from '../../../services/settings.service';
-import { TextFieldModule } from '@angular/cdk/text-field';
+import { AutosizeDirective } from '../../../services/autosize.directive';
 
 @Component({
   selector: 'app-notes-list',
   standalone: true,
-  imports: [CommonModule, FormsModule,TextFieldModule, NoteComponent, AutosizeModule, ClickOutsideDirective, DragDropModule, CdkDragPreview],
+  imports: [CommonModule, FormsModule, AutosizeDirective, NoteComponent, ClickOutsideDirective, DragDropModule, CdkDragPreview],
   templateUrl: './notes-list.component.html',
   styleUrls: ['./notes-list.component.scss']
 })

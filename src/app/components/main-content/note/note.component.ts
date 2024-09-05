@@ -9,15 +9,14 @@ import { ColorService } from '../../../services/color.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { ClickOutsideDirective } from '../../../services/click-outside.directive';
 import { ChecklistService } from '../../../services/checklist.service';
-import { AutosizeModule } from 'ngx-autosize';
 import { LabelService } from '../../../services/label.service';
 import { Subscription } from 'rxjs';
 import { SettingsService } from '../../../services/settings.service';
-import { TextFieldModule } from '@angular/cdk/text-field';
+import { AutosizeDirective } from '../../../services/autosize.directive';
 @Component({
   selector: 'app-note',
   standalone: true,
-  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule, MatMenuModule, ClickOutsideDirective, AutosizeModule,TextFieldModule],
+  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule, MatMenuModule, ClickOutsideDirective, AutosizeDirective],
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.scss']
 })

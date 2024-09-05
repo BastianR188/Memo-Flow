@@ -3,7 +3,7 @@
         <div class="input-box">
             <div class="input-line title-box">
                 <textarea [style.backgroundColor]="checkColor()" [ngClass]="{'dark-mode-input': darkMode}"
-                    class="input-title" autosize cdkTextareaAutosize cdkAutosizeMinRows="1"  type="text" [(ngModel)]="title" placeholder="Title"
+                    class="input-title" autosize type="text" [(ngModel)]="title" placeholder="Title"
                     rows="1"></textarea>
                 <span class="pinn">
                     <img *ngIf="isPinned" class="icon" [ngClass]="{'invert-svg-icon': darkMode}"
@@ -15,7 +15,7 @@
             <div class="input-content-container">
                 <div *ngIf="!isChecklist" class="input-line title-box">
                     <textarea [style.backgroundColor]="checkColor()" class="input-content"
-                        [ngClass]="{'dark-mode-input': darkMode}" autosize cdkTextareaAutosize cdkAutosizeMinRows="1" type="text" [(ngModel)]="note"
+                        [ngClass]="{'dark-mode-input': darkMode}" autosize type="text" [(ngModel)]="note"
                         placeholder="Note" rows="1"></textarea>
 
                 </div>
@@ -28,7 +28,7 @@
                                 [alt]="item.checked ? 'Checked' : 'Unchecked'">
                             <textarea #textArea [id]="'item-' + item.id" [style.backgroundColor]="checkColor()"
                                 class="input-content textbox checklist-area-input"
-                                [ngClass]="{'dark-mode-input': darkMode}" autosize cdkTextareaAutosize cdkAutosizeMinRows="1" type="text"
+                                [ngClass]="{'dark-mode-input': darkMode}" autosize type="text"
                                 [(ngModel)]="checklistItems[i].text" placeholder="Checklist Item" rows="1"></textarea>
                             <div class="closebox">
                                 <img class="icon close" (click)="removeChecklistItem(item.id)"
