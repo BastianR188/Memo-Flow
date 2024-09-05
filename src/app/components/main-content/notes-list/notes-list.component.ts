@@ -13,11 +13,12 @@ import { ClickOutsideDirective } from '../../../services/click-outside.directive
 import { CdkDragDrop, CdkDragPreview, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Observable, Subscription } from 'rxjs';
 import { SettingsService } from '../../../services/settings.service';
+import { TextFieldModule } from '@angular/cdk/text-field';
 
 @Component({
   selector: 'app-notes-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, NoteComponent, AutosizeModule, ClickOutsideDirective, DragDropModule, CdkDragPreview],
+  imports: [CommonModule, FormsModule,TextFieldModule, NoteComponent, AutosizeModule, ClickOutsideDirective, DragDropModule, CdkDragPreview],
   templateUrl: './notes-list.component.html',
   styleUrls: ['./notes-list.component.scss']
 })

@@ -13,10 +13,11 @@ import { AutosizeModule } from 'ngx-autosize';
 import { LabelService } from '../../../services/label.service';
 import { Subscription } from 'rxjs';
 import { SettingsService } from '../../../services/settings.service';
+import { TextFieldModule } from '@angular/cdk/text-field';
 @Component({
   selector: 'app-note',
   standalone: true,
-  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule, MatMenuModule, ClickOutsideDirective, AutosizeModule],
+  imports: [CommonModule, CdkDropList, CdkDrag, FormsModule, MatMenuModule, ClickOutsideDirective, AutosizeModule,TextFieldModule],
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.scss']
 })
