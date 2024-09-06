@@ -23,6 +23,8 @@ export interface userData {
     noteIds: string[];
     labelIds: string[];
     darkMode: boolean;
+    passwordHash: string;
+    username: string;
     // andere Felder...
 }
 

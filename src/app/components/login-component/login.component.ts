@@ -16,14 +16,19 @@ export class LoginComponent {
   password: string = '';
 
   constructor(private router: Router, private authService: AuthService) { }
+  validatePassword(password: string): boolean {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasNonalphas = /\W/.test(password);
+    
+    return password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasNonalphas;
+  }
+
   async login() {
-    if (await this.authService.login(this.userId, this.password)) {
-      this.router.navigate(['/notes', this.userId]);
-    } else {
-      alert('Invalid credentials');
+    if (!this.validatePassword(this.password)) {
+      alert('Password does not meet security requirements');
+      return;
     }
-  }
-  loginWithGoogle() {
-    this.authService.signInWithGoogle();
-  }
-}
+}}
